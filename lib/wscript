@@ -35,10 +35,4 @@ def build(bld):
        target       = 'bitvec_test',
        use          = 'RSDIC',
        includes     = '.')
-  bld.program(
-       features     = 'gtest',
-       source       = 'CombinationTest.cpp',
-       target       = 'combination_test',
-       use          = '',
-       includes     = '.')
   bld.install_files('${PREFIX}/include/rsdic', bld.path.ant_glob('*.hpp'))

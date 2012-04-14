@@ -18,7 +18,7 @@
  */
 
 #include <iostream>
-#include "../lib/Combination.hpp"
+#include "Combination.hpp"
 
 using namespace std;
 

@@ -11,6 +11,12 @@ def build(bld):
        use          = 'RSDIC',
        includes     = '.')
   bld.program(
+       features     = 'gtest',
+       source       = 'CombinationTest.cpp',
+       target       = 'combination_test',
+       use          = '',
+       includes     = '.')
+  bld.program(
        source       = 'CombinationGenerator.cpp',
        target       = 'CombinationGenerator',
        use          = '',
