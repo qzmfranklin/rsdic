@@ -6,8 +6,8 @@ def configure(ctx):
 
 def build(bld):
   bld.program(
-       source       = 'performance_test.cpp',
-       target       = 'performance_test',
+       source       = 'PerformanceTest.cpp',
+       target       = 'PerformanceTest',
        use          = 'RSDIC',
        includes     = '.')
   bld.program(

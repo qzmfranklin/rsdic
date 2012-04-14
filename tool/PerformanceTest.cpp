@@ -55,35 +55,38 @@ int main(int argc, char* argv[]){
   RSDic bv;
   bvb.Build(bv);
 
+  uint64_t query_num = 1000000;
   uint64_t dummy = 0;
 
+  cout << "bits per orig bit\tGetBit qps\tRank qps\tSelect qps" << endl;
 
-  cout << (float)bv.GetUsageBytes() / (num / 8) << "\t";
+  cout << (float)bv.GetUsageBytes() * 8 / num << "\t";
 
   double start = gettimeofday_sec();
-  for (uint64_t i = 0; i < 1000000; ++i){
+  for (uint64_t i = 0; i < query_num; ++i){
     uint64_t pos = rand() % num;
     dummy += bv.GetBit(pos);
   }
-  cout << gettimeofday_sec() - start << "\t";
+  cout << query_num / (gettimeofday_sec() - start) << "\t";
 
   start = gettimeofday_sec();
-  for (uint64_t i = 0; i < 1000000; ++i){
+  for (uint64_t i = 0; i < query_num; ++i){
     uint64_t pos = rand() % num;
     dummy += bv.Rank(pos, 1);
   }
-  cout << gettimeofday_sec() - start << "\t";
+  cout << query_num / (gettimeofday_sec() - start) << "\t";
 
   uint64_t one_num = bv.one_num();
   start = gettimeofday_sec();
-  for (uint64_t i = 0; i < 1000000; ++i){
+  for (uint64_t i = 0; i < query_num; ++i){
     uint64_t pos = rand() % one_num;
     dummy += bv.Select(pos, 1);
   }
-  cout << gettimeofday_sec() - start << endl;
+  cout << query_num / (gettimeofday_sec() - start) << endl;
 
   if (dummy == 777){
-    cout << "your very lucky" << endl;
+    // your very lucky
+    return -1;
   }
 
   return 0;
