@@ -92,7 +92,7 @@ TEST(RSDic, trivial_one){
   ASSERT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
     ASSERT_EQ(1, bv.GetBit(i));
-    ASSERT_EQ(i, bv.Rank(i, 1));
+    ASSERT_EQ(i, bv.Rank(i, 1)) << " i=" << i;
     ASSERT_EQ(i, bv.Select(i, 1)) << " i=" << i;
   }
 }

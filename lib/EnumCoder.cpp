@@ -48,7 +48,11 @@ uint64_t EnumCoder::Decode(uint64_t code, uint64_t rank_sb){
   return ret;
 }
 
+
 bool EnumCoder::GetBit(uint64_t code, uint64_t rank_sb, uint64_t pos){
+  if (Len(rank_sb) == kSmallBlockSize){
+    return (code >> pos) & 1LLU;
+  }
   for (uint64_t i = 0; i < pos; ++i){
     uint64_t zero_case_num = 
       kCombinationTable64_[kSmallBlockSize - i - 1][rank_sb];
@@ -61,6 +65,19 @@ bool EnumCoder::GetBit(uint64_t code, uint64_t rank_sb, uint64_t pos){
 }
 
 uint64_t EnumCoder::Rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
+  if (Len(rank_sb) == kSmallBlockSize){
+    uint64_t r = code & ((1LLU << pos) - 1);
+    r = (r & 0x5555555555555555ULL) +
+      ((r >> 1) & 0x5555555555555555ULL);
+    r = (r & 0x3333333333333333ULL) +
+      ((r >> 2) & 0x3333333333333333ULL);
+    r = (r + (r >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
+    r = r + (r >>  8);
+    r = r + (r >> 16);
+    r = r + (r >> 32);
+    return (uint64_t)(r & 0x7f);
+  }
+
   uint64_t cur_rank = rank_sb;
   for (uint64_t i = 0; i < pos; ++i){
     uint64_t zero_case_num = 
@@ -74,6 +91,15 @@ uint64_t EnumCoder::Rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
 }
 
 uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
+  if (Len(rank_sb) == kSmallBlockSize){
+    for (uint64_t offset = 0; offset < kSmallBlockSize; ++offset){
+      if (!((code >> offset) & 1LLU)){
+        --num;
+        if (num == 0) return offset;
+      }
+    }
+    assert(false);
+  }
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){
     uint64_t zero_case_num = kCombinationTable64_[kSmallBlockSize - offset - 1][rank_sb];
     if (code >= zero_case_num){
@@ -88,6 +114,16 @@ uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
 }
 
 uint64_t EnumCoder::Select1(uint64_t code, uint64_t rank_sb, uint64_t num){
+  if (Len(rank_sb) == kSmallBlockSize){
+    for (uint64_t offset = 0; offset < kSmallBlockSize; ++offset){
+      if ((code >> offset) & 1LLU){
+        --num;
+        if (num == 0) return offset;
+      }
+    }
+    assert(false);
+  }
+
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){
     uint64_t zero_case_num = kCombinationTable64_[kSmallBlockSize - offset - 1][rank_sb];
     if (code >= zero_case_num){

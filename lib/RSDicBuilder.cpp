@@ -69,9 +69,15 @@ void RSDicBuilder::WriteBlock(){
     uint64_t rank_sb = one_num_ - prev_one_num_;
     rank_small_blocks_.push_back(rank_sb);
     prev_one_num_ = one_num_;
-    
+
+
     uint64_t len = EnumCoder::Len(rank_sb);
-    uint64_t code = EnumCoder::Encode(buf_, rank_sb);
+    uint64_t code = 0;
+    if (len == kSmallBlockSize){
+      code = buf_; // use raw 
+    } else {
+      code = EnumCoder::Encode(buf_, rank_sb);
+    }
     uint64_t new_size =  Util::Floor(offset_ + len, kSmallBlockSize);
     if (new_size > bits_.size()) {
       bits_.push_back(0);

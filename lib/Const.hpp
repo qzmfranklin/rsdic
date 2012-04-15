@@ -27,6 +27,7 @@ namespace rsdic{
 static const uint64_t kLargeBlockSize = 1024;
 static const uint64_t kSmallBlockSize = 64;
 static const uint64_t kSelectBlockSize = 2048;
+static const uint64_t kUseRawLen = 48;
 static const uint64_t kSmallBlockPerLargeBlock = kLargeBlockSize / kSmallBlockSize;
 
 

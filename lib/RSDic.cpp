@@ -54,6 +54,7 @@ bool RSDic::GetBit(uint64_t pos) const{
   uint64_t rank_sb = rank_small_blocks_[sblock];
   uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::Len(rank_sb));
   return EnumCoder::GetBit(code, rank_sb, pos % kSmallBlockSize);
+
 }
 
 uint64_t RSDic::Rank(uint64_t pos, bool bit) const{

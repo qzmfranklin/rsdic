@@ -37,6 +37,7 @@ public:
     if (offset + len > kSmallBlockSize){
       ret |= (bits[block+1] << (kSmallBlockSize - offset));
     }
+    if (len == 64) return ret;
     return ret & ((1LLU << len) - 1);
   }
 
