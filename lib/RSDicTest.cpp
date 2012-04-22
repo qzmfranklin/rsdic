@@ -134,3 +134,24 @@ TEST(RSDic, random){
   ASSERT_EQ(bv, bv_load);
 }
 
+TEST(RSDic, large){
+  RSDicBuilder rsdb;
+  const uint64_t n = 26843545;
+  vector<uint64_t> poses;
+  for (uint64_t i = 0; i < n; ++i){
+    float r = (float)rand() / RAND_MAX;
+    if (r < 0.001) {
+      rsdb.PushBack(1);
+      poses.push_back(i);
+    }
+    else rsdb.PushBack(0);
+  }
+
+  RSDic bv;
+  rsdb.Build(bv);
+  uint64_t one_num = bv.one_num();
+  for (uint64_t i = 0; i < one_num; ++i){
+    ASSERT_EQ(poses[i], bv.Select(i, 1));
+  }
+}
+  

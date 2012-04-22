@@ -133,6 +133,7 @@ uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
 }
 
 uint64_t EnumCoder::Select1(uint64_t code, uint64_t rank_sb, uint64_t num){
+  assert(num <= rank_sb);
   if (Len(rank_sb) == kSmallBlockSize){
     return SelectRaw(code, num);
   }

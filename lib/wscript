@@ -26,13 +26,13 @@ def build(bld):
   bld.program(
        features     = 'gtest',
        source       = 'RSDicBuilderTest.cpp',
-       target       = 'bitvec_builder_test',
+       target       = 'rsdic_builder_test',
        use          = 'RSDIC',
        includes     = '.')
   bld.program(
        features     = 'gtest',
        source       = 'RSDicTest.cpp',
-       target       = 'bitvec_test',
+       target       = 'rsdic_test',
        use          = 'RSDIC',
        includes     = '.')
   bld.install_files('${PREFIX}/include/rsdic', bld.path.ant_glob('*.hpp'))

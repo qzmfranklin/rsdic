@@ -77,14 +77,13 @@ uint64_t RSDic::Select1(uint64_t ind) const{
   uint64_t select_ind = ind / kSelectBlockSize;
   uint64_t lblock = select_one_inds_[select_ind];
   for (; lblock < rank_blocks_.size(); ++lblock){
-    if (rank_blocks_[lblock] >= ind) break;
+    if (ind < rank_blocks_[lblock]) break;
   }
   --lblock;
-
   uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
   uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t remain = ind - rank_blocks_[lblock];
-
+  uint64_t remain = ind - rank_blocks_[lblock] + 1;
+  
   for (; sblock < rank_small_blocks_.size(); ++sblock){
     const uint64_t rank_sb = rank_small_blocks_[sblock];
     if (remain <= rank_sb) break;
@@ -100,13 +99,13 @@ uint64_t RSDic::Select0(uint64_t ind) const{
   uint64_t select_ind = ind / kSelectBlockSize;
   uint64_t lblock = select_zero_inds_[select_ind];
   for (; lblock < rank_blocks_.size(); ++lblock){
-    if (lblock * kLargeBlockSize - rank_blocks_[lblock] >= ind) break;
+    if (lblock * kLargeBlockSize - rank_blocks_[lblock] > ind) break;
   }
   --lblock;
 
   uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
   uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t remain = ind - lblock * kLargeBlockSize + rank_blocks_[lblock];
+  uint64_t remain = ind - lblock * kLargeBlockSize + rank_blocks_[lblock] + 1;
 
   for (; sblock < rank_small_blocks_.size(); ++sblock){
     const uint64_t rank_sb = kSmallBlockSize - rank_small_blocks_[sblock];
@@ -120,7 +119,6 @@ uint64_t RSDic::Select0(uint64_t ind) const{
 }
 
 uint64_t RSDic::Select(uint64_t ind, bool bit) const{
-  ++ind;
   if (bit) return Select1(ind);
   else return Select0(ind);
 }
@@ -149,7 +147,8 @@ void RSDic::Load(istream& is){
 
 uint64_t RSDic::GetUsageBytes() const{
   /*
-  cout << "bits:" << bits_.size() * sizeof(bits_[0]) << endl
+  cout << endl
+       << "bits:" << bits_.size() * sizeof(bits_[0]) << endl
        << " ptb:" << pointer_blocks_.size() * sizeof(pointer_blocks_[0]) << endl
        << "  rb:" << rank_blocks_.size() * sizeof(rank_blocks_[0]) << endl
        << " soi:" << select_one_inds_.size() * sizeof(select_one_inds_[0]) << endl

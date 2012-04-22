@@ -91,13 +91,12 @@ int main(int argc, char* argv[]){
   uint64_t num = atoll(argv[1]);
   cout << "ratio\tentropy\tbits per orig bit\tGetBit qps\tRank qps\tSelect qps" << endl;
   Test(num, 0.5);
-  Test(num, 0.4);
-  Test(num, 0.3);
-  Test(num, 0.2);
   Test(num, 0.1);
   Test(num, 0.05);
   Test(num, 0.01);
   Test(num, 0.005);
   Test(num, 0.001);
+  Test(num, 0.9);
+  Test(num, 0.99);
   return 0;
 }
