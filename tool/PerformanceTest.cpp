@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <cmath>
 #include "../lib/RSDic.hpp"
 #include "../lib/RSDicBuilder.hpp"
 
@@ -36,14 +37,7 @@ double gettimeofday_sec()
 using namespace std;
 using namespace rsdic;
 
-int main(int argc, char* argv[]){
-  if (argc != 3){
-    cerr << argv[0] << " num ratio" << endl;
-    return -1;
-  }
-  uint64_t num = atoll(argv[1]);
-  float ratio = atof(argv[2]);
-
+void Test(uint64_t num, float ratio){
   RSDicBuilder bvb;
   for (uint64_t i = 0; i < num; ++i){
     float r = (float)rand() / RAND_MAX;
@@ -51,15 +45,14 @@ int main(int argc, char* argv[]){
     else bvb.PushBack(0);
   }
 
-
   RSDic bv;
   bvb.Build(bv);
 
   uint64_t query_num = 1000000;
   uint64_t dummy = 0;
 
-  cout << "bits per orig bit\tGetBit qps\tRank qps\tSelect qps" << endl;
-
+  uint64_t m = bv.one_num();
+  cout << ratio << "\t" << m * (1 / log(2) + log((float)num / m) / log(2.0)) / num << "\t";
   cout << (float)bv.GetUsageBytes() * 8 / num << "\t";
 
   double start = gettimeofday_sec();
@@ -86,8 +79,25 @@ int main(int argc, char* argv[]){
 
   if (dummy == 777){
     // your very lucky
+    cout << "";
+  }
+}
+
+int main(int argc, char* argv[]){
+  if (argc != 2){
+    cerr << argv[0] << " num" << endl;
     return -1;
   }
-
+  uint64_t num = atoll(argv[1]);
+  cout << "ratio\tentropy\tbits per orig bit\tGetBit qps\tRank qps\tSelect qps" << endl;
+  Test(num, 0.5);
+  Test(num, 0.4);
+  Test(num, 0.3);
+  Test(num, 0.2);
+  Test(num, 0.1);
+  Test(num, 0.05);
+  Test(num, 0.01);
+  Test(num, 0.005);
+  Test(num, 0.001);
   return 0;
 }

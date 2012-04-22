@@ -64,18 +64,23 @@ bool EnumCoder::GetBit(uint64_t code, uint64_t rank_sb, uint64_t pos){
   return (code >= kCombinationTable64_[kSmallBlockSize - pos - 1][rank_sb]);
 }
 
+uint64_t EnumCoder::PopCount(uint64_t code){
+  uint64_t r = code;
+  r = (r & 0x5555555555555555ULL) +
+    ((r >> 1) & 0x5555555555555555ULL);
+  r = (r & 0x3333333333333333ULL) +
+    ((r >> 2) & 0x3333333333333333ULL);
+  r = (r + (r >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
+  r = r + (r >>  8);
+  r = r + (r >> 16);
+  r = r + (r >> 32);
+  return (uint64_t)(r & 0x7f);
+
+}
+
 uint64_t EnumCoder::Rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
   if (Len(rank_sb) == kSmallBlockSize){
-    uint64_t r = code & ((1LLU << pos) - 1);
-    r = (r & 0x5555555555555555ULL) +
-      ((r >> 1) & 0x5555555555555555ULL);
-    r = (r & 0x3333333333333333ULL) +
-      ((r >> 2) & 0x3333333333333333ULL);
-    r = (r + (r >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
-    r = r + (r >>  8);
-    r = r + (r >> 16);
-    r = r + (r >> 32);
-    return (uint64_t)(r & 0x7f);
+    return PopCount(code & ((1LLU << pos) - 1));
   }
 
   uint64_t cur_rank = rank_sb;
@@ -90,15 +95,29 @@ uint64_t EnumCoder::Rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
   return rank_sb - cur_rank;
 }
 
+uint64_t EnumCoder::SelectRaw(uint64_t code, uint64_t num){
+  uint64_t offset = 0;
+  for (; offset < kSmallBlockSize; offset += 8){
+    uint8_t r = kPopCount_[(code >> offset) & 0xff];
+    if (num > r){
+      num -= r;
+    } else {
+      break;
+    }
+  }
+  
+  for (; offset < kSmallBlockSize; ++offset){
+    if ((code >> offset) & 1LLU){
+      --num;
+      if (num == 0) return offset;
+      }
+  }
+  assert(false);
+}
+
 uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
   if (Len(rank_sb) == kSmallBlockSize){
-    for (uint64_t offset = 0; offset < kSmallBlockSize; ++offset){
-      if (!((code >> offset) & 1LLU)){
-        --num;
-        if (num == 0) return offset;
-      }
-    }
-    assert(false);
+    return SelectRaw(~code, num);
   }
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){
     uint64_t zero_case_num = kCombinationTable64_[kSmallBlockSize - offset - 1][rank_sb];
@@ -115,13 +134,7 @@ uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
 
 uint64_t EnumCoder::Select1(uint64_t code, uint64_t rank_sb, uint64_t num){
   if (Len(rank_sb) == kSmallBlockSize){
-    for (uint64_t offset = 0; offset < kSmallBlockSize; ++offset){
-      if ((code >> offset) & 1LLU){
-        --num;
-        if (num == 0) return offset;
-      }
-    }
-    assert(false);
+    return SelectRaw(code, num);
   }
 
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){
@@ -140,15 +153,43 @@ uint64_t EnumCoder::Select(uint64_t code, uint64_t rank_sb, uint64_t num, bool b
   if (num == 0) return 0;
   if (bit) return Select1(code, rank_sb, num);
   else return Select0(code, rank_sb, num);
-
 }
 
+const uint8_t EnumCoder::kEnumCodeLength_[65] = {
+  0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 64,
+  64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+  64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+  64, 64, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6, 
+  0};
+
+
+/*
 const uint64_t EnumCoder::kEnumCodeLength_[65] = {
   0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 48, 
   49, 51, 52, 53, 55, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 61,
   61, 61, 61, 61, 60, 60, 60, 59, 58, 58, 57, 56, 55, 53, 52, 51, 
   49, 48, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6, 
   0};
+*/
+
+const uint8_t EnumCoder::kPopCount_[256] = {
+0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,
+  1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+  1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+  1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+  2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
+  3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+  3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,
+  4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8
+};
 
 
 const uint64_t EnumCoder::kCombinationTable64_[65][65] = 

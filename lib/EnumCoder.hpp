@@ -34,19 +34,18 @@ public:
   static uint64_t Select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit);
 
   static uint64_t Len(uint64_t rank_sb){
-    if (kEnumCodeLength_[rank_sb] >= kUseRawLen){
-      return kSmallBlockSize;
-    } else {
-      return kEnumCodeLength_[rank_sb];
-    }
+    return kEnumCodeLength_[rank_sb];
   }
 
   static uint64_t Select0(uint64_t code, uint64_t rank_sb, uint64_t num);
   static uint64_t Select1(uint64_t code, uint64_t rank_sb, uint64_t num);
 
 private:
+  static uint64_t PopCount(uint64_t code);
+  static uint64_t SelectRaw(uint64_t code, uint64_t num);
+  static const uint8_t kPopCount_[256];
   static const uint64_t kCombinationTable64_[65][65];
-  static const uint64_t kEnumCodeLength_[65];
+  static const uint8_t kEnumCodeLength_[65];
 };
 
 }
