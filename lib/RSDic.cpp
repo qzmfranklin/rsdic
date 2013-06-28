@@ -67,6 +67,9 @@ uint64_t RSDic::Rank(uint64_t pos, bool bit) const{
     rank += rank_sb;
     pointer += EnumCoder::Len(rank_sb);
   }
+  if (pos % kSmallBlockSize == 0){
+    return Util::GetNum(bit, rank, pos);
+  }
   uint64_t rank_sb = rank_small_blocks_[sblock];
   uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::Len(rank_sb));
   rank += EnumCoder::Rank(code, rank_sb, pos % kSmallBlockSize);
