@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -36,6 +36,7 @@ public:
   bool GetBit(uint64_t pos) const;
   uint64_t Rank(uint64_t pos, bool bit) const;
   uint64_t Select(uint64_t ind, bool bit) const;
+  std::pair<uint64_t, uint64_t> GetBitAndRank(uint64_t pos) const;
   void Save(std::ostream& os) const;
   void Load(std::istream& is);
   uint64_t GetUsageBytes() const;
@@ -48,12 +49,16 @@ public:
     return one_num_;
   }
 
+  uint64_t zero_num() const{
+    return num_ - one_num_;
+  }
+
   bool operator == (const RSDic& bv) const;
 
 
 private:
   friend class RSDicBuilder;
-  
+
   uint64_t Select1(uint64_t ind) const;
   uint64_t Select0(uint64_t ind) const;
 

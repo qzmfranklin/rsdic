@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -48,7 +48,7 @@ TEST(RSDic, small){
   for (int i = 0; i < n; ++i){
     bvb.PushBack(1);
   }
-  
+
   RSDic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
@@ -67,7 +67,7 @@ TEST(RSDic, trivial_zero){
   for (int i = 0; i < n; ++i){
     bvb.PushBack(0);
   }
-  
+
   RSDic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
@@ -85,7 +85,7 @@ TEST(RSDic, trivial_one){
   for (int i = 0; i < n; ++i){
     bvb.PushBack(1);
   }
-  
+
   RSDic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
@@ -107,20 +107,25 @@ TEST(RSDic, random){
     bvb.PushBack(b);
     B.push_back(b);
   }
-  
+
   RSDic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
   int sum = 0;
   for (size_t i = 0; i < bv.num(); ++i){
     ASSERT_EQ(B[i]  , bv.GetBit(i)) << " i=" << i;
+    pair<uint64_t, uint64_t> bit_rank = bv.GetBitAndRank(i);
+    ASSERT_EQ(B[i], bit_rank.first);
     if (B[i]){
       ASSERT_EQ(sum, bv.Rank(i, 1));
+      ASSERT_EQ(sum, bit_rank.second);
       ASSERT_EQ(i,bv.Select(sum, 1));
     } else {
       ASSERT_EQ(i - sum, bv.Rank(i, 0));
+      ASSERT_EQ(i - sum, bit_rank.second);
       ASSERT_EQ(i, bv.Select(i-sum, 0));
     }
+
     sum += B[i];
   }
 
@@ -154,4 +159,4 @@ TEST(RSDic, large){
     ASSERT_EQ(poses[i], bv.Select(i, 1));
   }
 }
-  
+

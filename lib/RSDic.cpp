@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -54,7 +54,6 @@ bool RSDic::GetBit(uint64_t pos) const{
   uint64_t rank_sb = rank_small_blocks_[sblock];
   uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::Len(rank_sb));
   return EnumCoder::GetBit(code, rank_sb, pos % kSmallBlockSize);
-
 }
 
 uint64_t RSDic::Rank(uint64_t pos, bool bit) const{
@@ -76,6 +75,24 @@ uint64_t RSDic::Rank(uint64_t pos, bool bit) const{
   return Util::GetNum(bit, rank, pos);
 }
 
+pair<uint64_t, uint64_t> RSDic::GetBitAndRank(uint64_t pos) const{
+  uint64_t lblock = pos / kLargeBlockSize;
+  uint64_t pointer = pointer_blocks_[lblock];
+  uint64_t sblock = pos / kSmallBlockSize;
+  uint64_t rank = rank_blocks_[lblock];
+  for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i){
+    uint64_t rank_sb = rank_small_blocks_[i];
+    rank += rank_sb;
+    pointer += EnumCoder::Len(rank_sb);
+  }
+  uint64_t rank_sb = rank_small_blocks_[sblock];
+  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::Len(rank_sb));
+  rank += EnumCoder::Rank(code, rank_sb, pos % kSmallBlockSize);
+  uint64_t ret_bit = EnumCoder::GetBit(code, rank_sb, pos % kSmallBlockSize);
+  return make_pair(ret_bit, Util::GetNum(ret_bit, rank, pos));
+}
+
+
 uint64_t RSDic::Select1(uint64_t ind) const{
   uint64_t select_ind = ind / kSelectBlockSize;
   uint64_t lblock = select_one_inds_[select_ind];
@@ -86,7 +103,7 @@ uint64_t RSDic::Select1(uint64_t ind) const{
   uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
   uint64_t pointer = pointer_blocks_[lblock];
   uint64_t remain = ind - rank_blocks_[lblock] + 1;
-  
+
   for (; sblock < rank_small_blocks_.size(); ++sblock){
     const uint64_t rank_sb = rank_small_blocks_[sblock];
     if (remain <= rank_sb) break;
@@ -158,19 +175,19 @@ uint64_t RSDic::GetUsageBytes() const{
        << " soz:" <<     select_zero_inds_.size() * sizeof(select_zero_inds_[0]) << endl
        << " rsb:" <<     rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) << endl;
   */
-  return 
+  return
     bits_.size() * sizeof(bits_[0]) +
     pointer_blocks_.size() * sizeof(pointer_blocks_[0]) +
     rank_blocks_.size() * sizeof(rank_blocks_[0]) +
     select_one_inds_.size() * sizeof(select_one_inds_[0]) +
     select_zero_inds_.size() * sizeof(select_zero_inds_[0]) +
     rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) +
-    sizeof(num_) + 
+    sizeof(num_) +
     sizeof(one_num_);
 }
 
 bool RSDic::operator == (const RSDic& bv) const{
-  return 
+  return
     bits_ == bv.bits_ &&
     pointer_blocks_ == bv.pointer_blocks_ &&
     rank_blocks_ == bv.rank_blocks_ &&
