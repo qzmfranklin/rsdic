@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <stdint.h>
-#include "Const.hpp"
+#include "Const.h"
 
 namespace rsdic{
 

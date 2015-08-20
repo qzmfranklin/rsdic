@@ -18,10 +18,10 @@
  */
 
 #include <cassert>
-#include "Const.hpp"
-#include "Util.hpp"
-#include "EnumCoder.hpp"
-#include "Rsdic.hpp"
+#include "Const.h"
+#include "Util.h"
+#include "EnumCoder.h"
+#include "Rsdic.h"
 
 using namespace std;
 

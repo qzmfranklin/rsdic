@@ -18,7 +18,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "EnumCoder.hpp"
+#include "EnumCoder.h"
 
 using namespace std;
 using namespace rsdic;

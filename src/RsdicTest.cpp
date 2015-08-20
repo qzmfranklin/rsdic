@@ -18,11 +18,11 @@
  */
 
 #include <gtest/gtest.h>
-#include "RsdicBuilder.hpp"
+#include "RsdicBuilder.h"
 
 #define private public
-#include "Rsdic.hpp"
-#include "EnumCoder.hpp"
+#include "Rsdic.h"
+#include "EnumCoder.h"
 
 
 using namespace std;

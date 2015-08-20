@@ -18,8 +18,8 @@
  */
 
 #include <cassert>
-#include "Const.hpp"
-#include "EnumCoder.hpp"
+#include "Const.h"
+#include "EnumCoder.h"
 
 namespace rsdic{
 

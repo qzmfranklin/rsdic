@@ -17,11 +17,11 @@
  *      software without specific prior written permission.
  */
 
-#include "Rsdic.hpp"
-#include "Const.hpp"
-#include "Util.hpp"
-#include "EnumCoder.hpp"
-#include "RsdicBuilder.hpp"
+#include "Rsdic.h"
+#include "Const.h"
+#include "Util.h"
+#include "EnumCoder.h"
+#include "RsdicBuilder.h"
 
 using namespace std;
 

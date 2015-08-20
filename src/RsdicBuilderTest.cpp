@@ -19,12 +19,12 @@
 
 #include <string>
 #include <gtest/gtest.h>
-#include "Const.hpp"
-#include "EnumCoder.hpp"
+#include "Const.h"
+#include "EnumCoder.h"
 
 #define private public
-#include "Rsdic.hpp"
-#include "RsdicBuilder.hpp"
+#include "Rsdic.h"
+#include "RsdicBuilder.h"
 
 
 using namespace std;

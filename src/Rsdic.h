@@ -23,7 +23,7 @@
 #include <vector>
 #include <iostream>
 #include <stdint.h>
-#include "Type.hpp"
+#include "Type.h"
 
 namespace rsdic{
 

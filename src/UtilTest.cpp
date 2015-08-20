@@ -18,7 +18,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "Util.hpp"
+#include "Util.h"
 
 using namespace std;
 

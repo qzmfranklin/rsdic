@@ -21,7 +21,7 @@
 #define RSDIC_ENUM_CODER_HPP_
 
 #include <stdint.h>
-#include "Const.hpp"
+#include "Const.h"
 
 namespace rsdic{
 
