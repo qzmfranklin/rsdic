@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -37,7 +37,7 @@ uint64_t EnumCoder::Encode(uint64_t val, uint64_t rank_sb){
 uint64_t EnumCoder::Decode(uint64_t code, uint64_t rank_sb){
   uint64_t ret = 0;
   for (uint64_t i = 0; i < kSmallBlockSize; ++i){
-    uint64_t zero_case_num = 
+    uint64_t zero_case_num =
       kCombinationTable64_[kSmallBlockSize - i - 1][rank_sb];
     if (code >= zero_case_num){
       ret |= (1LLU << i);
@@ -54,7 +54,7 @@ bool EnumCoder::get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos){
     return (code >> pos) & 1LLU;
   }
   for (uint64_t i = 0; i < pos; ++i){
-    uint64_t zero_case_num = 
+    uint64_t zero_case_num =
       kCombinationTable64_[kSmallBlockSize - i - 1][rank_sb];
     if (code >= zero_case_num){
       code -= zero_case_num;
@@ -85,7 +85,7 @@ uint64_t EnumCoder::rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
 
   uint64_t cur_rank = rank_sb;
   for (uint64_t i = 0; i < pos; ++i){
-    uint64_t zero_case_num = 
+    uint64_t zero_case_num =
       kCombinationTable64_[kSmallBlockSize - i - 1][cur_rank];
     if (code >= zero_case_num){
       code -= zero_case_num;
@@ -105,7 +105,7 @@ uint64_t EnumCoder::SelectRaw(uint64_t code, uint64_t num){
       break;
     }
   }
-  
+
   for (; offset < kSmallBlockSize; ++offset){
     if ((code >> offset) & 1LLU){
       --num;
@@ -145,7 +145,7 @@ uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num){
       if (num == 0) return offset;
       code -= zero_case_num;
       --rank_sb;
-    } 
+    }
   }
   assert(false);
 }
@@ -160,16 +160,16 @@ const uint8_t EnumCoder::kEnumCodeLength_[65] = {
   0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 64,
   64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
   64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-  64, 64, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6, 
+  64, 64, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6,
   0};
 
 
 /*
 const uint64_t EnumCoder::kEnumCodeLength_[65] = {
-  0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 48, 
+  0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 48,
   49, 51, 52, 53, 55, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 61,
-  61, 61, 61, 61, 60, 60, 60, 59, 58, 58, 57, 56, 55, 53, 52, 51, 
-  49, 48, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6, 
+  61, 61, 61, 61, 60, 60, 60, 59, 58, 58, 57, 56, 55, 53, 52, 51,
+  49, 48, 46, 44, 42, 40, 38, 35, 33, 30, 27, 23, 20, 16, 11, 6,
   0};
 */
 
@@ -193,8 +193,8 @@ const uint8_t EnumCoder::kPopCount_[256] = {
 };
 
 
-const uint64_t EnumCoder::kCombinationTable64_[65][65] = 
-{ 
+const uint64_t EnumCoder::kCombinationTable64_[65][65] =
+{
 { 1LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU},
 { 1LLU, 1LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU},
 { 1LLU, 2LLU, 1LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU, 0LLU},
