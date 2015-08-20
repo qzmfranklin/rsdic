@@ -28,72 +28,72 @@ using namespace std;
 namespace rsdic
 {
 
-RsdicBuilder::RsdicBuilder() : buf_(0), offset_(0), bit_num_(0), one_num_(0), prev_one_num_(0), zero_num_(0)
+RsdicBuilder::RsdicBuilder() : _buf(0), _offset(0), _bit_num(0), _one_num(0), _prev_one_num(0), _zero_num(0)
 {
 }
 
 void RsdicBuilder::clear()
 {
-    bits_.clear();
-    pointer_blocks_.clear();
-    select_one_inds_.clear();
-    select_zero_inds_.clear();
-    rank_blocks_.clear();
-    rank_small_blocks_.clear();
-    buf_ = 0;
-    offset_ = 0;
-    bit_num_ = 0;
-    one_num_ = 0;
-    prev_one_num_ = 0;
-    zero_num_ = 0;
+    _bits.clear();
+    _pointer_blocks.clear();
+    _select_one_inds.clear();
+    _select_zero_inds.clear();
+    _rank_blocks.clear();
+    _rank_small_blocks.clear();
+    _buf = 0;
+    _offset = 0;
+    _bit_num = 0;
+    _one_num = 0;
+    _prev_one_num = 0;
+    _zero_num = 0;
 }
 
 void RsdicBuilder::push_back(bool bit)
 {
-    if (bit_num_ % kSmallBlockSize == 0) {
+    if (_bit_num % kSmallBlockSize == 0) {
         write_block();
     }
     if (bit) {
-        buf_ |= (1LLU << (bit_num_ % kSmallBlockSize));
-        if ((one_num_ % kSelectBlockSize) == 0) {
-            select_one_inds_.push_back(bit_num_ / kLargeBlockSize);
+        _buf |= (1LLU << (_bit_num % kSmallBlockSize));
+        if ((_one_num % kSelectBlockSize) == 0) {
+            _select_one_inds.push_back(_bit_num / kLargeBlockSize);
         }
-        ++one_num_;
+        ++_one_num;
     } else {
-        if ((zero_num_ % kSelectBlockSize) == 0) {
-            select_zero_inds_.push_back(bit_num_ / kLargeBlockSize);
+        if ((_zero_num % kSelectBlockSize) == 0) {
+            _select_zero_inds.push_back(_bit_num / kLargeBlockSize);
         }
-        ++zero_num_;
+        ++_zero_num;
     }
-    ++bit_num_;
+    ++_bit_num;
 }
 
 void RsdicBuilder::write_block()
 {
-    if (bit_num_ > 0) {
-        uint64_t rank_sb = one_num_ - prev_one_num_;
-        rank_small_blocks_.push_back(rank_sb);
-        prev_one_num_ = one_num_;
+    if (_bit_num > 0) {
+        uint64_t rank_sb = _one_num - _prev_one_num;
+        _rank_small_blocks.push_back(rank_sb);
+        _prev_one_num = _one_num;
 
 
         uint64_t len = EnumCoder::len(rank_sb);
         uint64_t code = 0;
         if (len == kSmallBlockSize) {
-            code = buf_; // use raw
+            code = _buf; // use raw
         } else {
-            code = EnumCoder::encode(buf_, rank_sb);
+            code = EnumCoder::encode(_buf, rank_sb);
         }
-        uint64_t new_size =  Util::Floor(offset_ + len, kSmallBlockSize);
-        if (new_size > bits_.size()) {
-            bits_.push_back(0);
+        uint64_t new_size =  Util::Floor(_offset + len, kSmallBlockSize);
+        if (new_size > _bits.size()) {
+            _bits.push_back(0);
         }
-        Util::SetSlice(bits_, offset_, len, code);
-        buf_ = 0;
-        offset_ += len;
+        Util::SetSlice(_bits, _offset, len, code);
+        _buf = 0;
+        _offset += len;
     }
-    if ((bit_num_ % kLargeBlockSize) == 0) {
-        rank_blocks_.push_back(one_num_);
-        pointer_blocks_.push_back(offset_);
+    if ((_bit_num % kLargeBlockSize) == 0) {
+        _rank_blocks.push_back(_one_num);
+        _pointer_blocks.push_back(_offset);
     }
 }
 
@@ -101,17 +101,17 @@ void RsdicBuilder::write_block()
 void RsdicBuilder::build(Rsdic& bv)
 {
     bv.clear();
-    if (bit_num_ == 0) return;
+    if (_bit_num == 0) return;
     write_block();
-    bv.num_ = bit_num_;
-    bv.one_num_ = one_num_;
+    bv._num = _bit_num;
+    bv._one_num = _one_num;
     // use copy instead of swap to allocate adequate working space
-    bv.bits_ = bits_;
-    bv.select_one_inds_ = select_one_inds_;
-    bv.select_zero_inds_ = select_zero_inds_;
-    bv.pointer_blocks_ = pointer_blocks_;
-    bv.rank_blocks_ = rank_blocks_;
-    bv.rank_small_blocks_ = rank_small_blocks_;
+    bv._bits = _bits;
+    bv._select_one_inds = _select_one_inds;
+    bv._select_zero_inds = _select_zero_inds;
+    bv._pointer_blocks = _pointer_blocks;
+    bv._rank_blocks = _rank_blocks;
+    bv._rank_small_blocks = _rank_small_blocks;
 }
 
 } // rsdic

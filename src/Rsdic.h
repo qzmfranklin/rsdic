@@ -40,49 +40,40 @@ public:
   std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
   void save(std::ostream& os) const;
   void load(std::istream& is);
-  uint64_t get_usage_bytes() const;
-
-  uint64_t num() const{
-    return num_;
-  }
-
-  uint64_t one_num() const{
-    return one_num_;
-  }
-
-  uint64_t zero_num() const{
-    return num_ - one_num_;
-  }
-
   bool operator == (const Rsdic& bv) const;
 
   friend class RsdicBuilder;
 
 private:
+  uint64_t get_usage_bytes() const;
+
+  uint64_t num() const{ return _num; }
+  uint64_t one_num() const{ return _one_num; }
+  uint64_t zero_num() const{ return _num - _one_num; }
 
   template <class T>
-  void save(std::ostream& os, const std::vector<T>& vs) const{
+  void _save(std::ostream& os, const std::vector<T>& vs) const{
     uint64_t size = vs.size();
     os.write((const char*)&size, sizeof(size));
     os.write((const char*)&vs[0], sizeof(vs[0]) * size);
   }
 
   template <class T>
-  void load(std::istream& is, std::vector<T>& vs){
+  void _load(std::istream& is, std::vector<T>& vs){
     uint64_t size = 0;
     is.read((char*)&size, sizeof(size));
     vs.resize(size);
     is.read((char*)&vs[0], sizeof(vs[0]) * size);
   }
 
-  std::vector<uint64_t> bits_;
-  std::vector<rsdic_uint> pointer_blocks_;
-  std::vector<rsdic_uint> rank_blocks_;
-  std::vector<rsdic_uint> select_one_inds_;
-  std::vector<rsdic_uint> select_zero_inds_;
-  std::vector<uint8_t> rank_small_blocks_;
-  uint64_t num_;
-  uint64_t one_num_;
+  std::vector<uint64_t> _bits;
+  std::vector<rsdic_uint> _pointer_blocks;
+  std::vector<rsdic_uint> _rank_blocks;
+  std::vector<rsdic_uint> _select_one_inds;
+  std::vector<rsdic_uint> _select_zero_inds;
+  std::vector<uint8_t> _rank_small_blocks;
+  uint64_t _num;
+  uint64_t _one_num;
 };
 
 } // rsdic

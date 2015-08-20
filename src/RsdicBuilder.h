@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -38,19 +38,19 @@ public:
 
 private:
   void write_block();
-  
-  std::vector<uint64_t> bits_;
-  std::vector<rsdic_uint> pointer_blocks_;
-  std::vector<rsdic_uint> select_one_inds_;
-  std::vector<rsdic_uint> select_zero_inds_;
-  std::vector<rsdic_uint> rank_blocks_;
-  std::vector<uint8_t> rank_small_blocks_;
-  uint64_t buf_;
-  rsdic_uint offset_;
-  rsdic_uint bit_num_;
-  rsdic_uint one_num_;
-  rsdic_uint prev_one_num_;
-  rsdic_uint zero_num_;
+
+  std::vector<uint64_t> _bits;
+  std::vector<rsdic_uint> _pointer_blocks;
+  std::vector<rsdic_uint> _select_one_inds;
+  std::vector<rsdic_uint> _select_zero_inds;
+  std::vector<rsdic_uint> _rank_blocks;
+  std::vector<uint8_t> _rank_small_blocks;
+  uint64_t _buf;
+  rsdic_uint _offset;
+  rsdic_uint _bit_num;
+  rsdic_uint _one_num;
+  rsdic_uint _prev_one_num;
+  rsdic_uint _zero_num;
 };
 
 }
