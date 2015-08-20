@@ -25,7 +25,6 @@
 #include "EnumCoder.h"
 
 
-using namespace std;
 using namespace rsdic;
 
 TEST(BitVec, combination){
@@ -100,7 +99,7 @@ TEST(Rsdic, trivial_one){
 
 TEST(Rsdic, random){
   RsdicBuilder bvb;
-  vector<int> B;
+  std::vector<int> B;
   const uint64_t n = 100000;
   for (int i = 0; i < n; ++i){
     int b = rand() % 2;
@@ -114,7 +113,7 @@ TEST(Rsdic, random){
   int sum = 0;
   for (size_t i = 0; i < bv.num(); ++i){
     EXPECT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
-    pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
+    std::pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
     EXPECT_EQ(B[i], bit_rank.first);
     if (B[i]){
       EXPECT_EQ(sum, bv.rank(i, 1));
@@ -129,9 +128,9 @@ TEST(Rsdic, random){
     sum += B[i];
   }
 
-  ostringstream os;
+  std::ostringstream os;
   bv.save(os);
-  istringstream is(os.str());
+  std::istringstream is(os.str());
 
   Rsdic bv_load;
   bv_load.load(is);
@@ -142,7 +141,7 @@ TEST(Rsdic, random){
 TEST(Rsdic, large){
   RsdicBuilder rsdb;
   const uint64_t n = 26843545;
-  vector<uint64_t> poses;
+  std::vector<uint64_t> poses;
   for (uint64_t i = 0; i < n; ++i){
     float r = (float)rand() / RAND_MAX;
     if (r < 0.001) {

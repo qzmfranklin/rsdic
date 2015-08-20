@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -27,8 +27,6 @@
 #include "RsdicBuilder.h"
 
 
-using namespace std;
-
 TEST(RsdicBuilder, trivial){
   rsdic::RsdicBuilder bvb;
   rsdic::Rsdic bv;
@@ -41,12 +39,12 @@ TEST(RsdicBuilder, trivial){
 TEST(RsdicBuilder, small){
   rsdic::RsdicBuilder bvb;
   rsdic::Rsdic bv;
-  
+
   bvb.push_back(0);
   bvb.push_back(1);
   bvb.push_back(0);
   bvb.build(bv);
-  
+
   EXPECT_EQ(3, bv.num());
   EXPECT_EQ(1, bv.one_num());
 }
@@ -58,7 +56,7 @@ TEST(RsdicBuilder, EnumCodeSmall){
 }
 
 TEST(RsdicBuilder, EnumCode){
-  string bits = "1110000011010011110011110110011001011111101011010111000000010010";
+  std::string bits = "1110000011010011110011110110011001011111101011010111000000010010";
   uint64_t val = 0;
   uint64_t one_num = 0;
   EXPECT_EQ(64, bits.size());

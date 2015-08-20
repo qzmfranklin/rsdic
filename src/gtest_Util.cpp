@@ -1,10 +1,10 @@
-/* 
+/*
  *  Copyright (c) 2012 Daisuke Okanohara
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above Copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -20,8 +20,6 @@
 #include <gtest/gtest.h>
 #include "Util.h"
 
-using namespace std;
-
 uint64_t GetBinLen(uint64_t x){
   uint64_t len = 0;
   for (; x >> len; ++len) {}
@@ -29,7 +27,7 @@ uint64_t GetBinLen(uint64_t x){
 }
 
 TEST(Util, Slice){
-  vector<uint64_t> vals;
+  std::vector<uint64_t> vals;
   uint64_t offset = 0;
   for (uint64_t i = 0; i < 10000; ++i){
     vals.push_back(rand());
@@ -37,7 +35,7 @@ TEST(Util, Slice){
   for (uint64_t i = 0; i < vals.size(); ++i){
     offset += GetBinLen(vals[i]);
   }
-  vector<uint64_t> bits(rsdic::Util::Floor(offset, 64));
+  std::vector<uint64_t> bits(rsdic::Util::Floor(offset, 64));
 
   offset = 0;
   for (uint64_t i = 0; i < vals.size(); ++i){
