@@ -56,7 +56,7 @@ TEST(Rsdic, small){
   for (size_t i = 0; i < bv.num(); ++i){
     ASSERT_EQ(1, bv.get_bit(i));
     ASSERT_EQ(i, bv.rank(i, 1));
-    ASSERT_EQ(i, bv.select(i, 1));
+    ASSERT_EQ(i, bv.select1(i));
   }
 }
 
@@ -75,7 +75,7 @@ TEST(Rsdic, trivial_zero){
   for (size_t i = 0; i < bv.num(); ++i){
     ASSERT_EQ(0, bv.get_bit(i));
     ASSERT_EQ(i, bv.rank(i, 0));
-    ASSERT_EQ(i, bv.select(i, 0)) << " i=" << i;
+    ASSERT_EQ(i, bv.select1(i)) << " i=" << i;
   }
 }
 
@@ -93,7 +93,7 @@ TEST(Rsdic, trivial_one){
   for (size_t i = 0; i < bv.num(); ++i){
     ASSERT_EQ(1, bv.get_bit(i));
     ASSERT_EQ(i, bv.rank(i, 1)) << " i=" << i;
-    ASSERT_EQ(i, bv.select(i, 1)) << " i=" << i;
+    ASSERT_EQ(i, bv.select1(i)) << " i=" << i;
   }
 }
 
@@ -119,11 +119,11 @@ TEST(Rsdic, random){
     if (B[i]){
       ASSERT_EQ(sum, bv.rank(i, 1));
       ASSERT_EQ(sum, bit_rank.second);
-      ASSERT_EQ(i,bv.select(sum, 1));
+      ASSERT_EQ(i,bv.select1(sum));
     } else {
       ASSERT_EQ(i - sum, bv.rank(i, 0));
       ASSERT_EQ(i - sum, bit_rank.second);
-      ASSERT_EQ(i, bv.select(i-sum, 0));
+      ASSERT_EQ(i, bv.select1(i-sum));
     }
 
     sum += B[i];
@@ -156,7 +156,7 @@ TEST(Rsdic, large){
   rsdb.build(bv);
   uint64_t one_num = bv.one_num();
   for (uint64_t i = 0; i < one_num; ++i){
-    ASSERT_EQ(poses[i], bv.select(i, 1));
+    ASSERT_EQ(poses[i], bv.select1(i));
   }
 }
 

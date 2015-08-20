@@ -138,11 +138,6 @@ uint64_t Rsdic::select0(uint64_t ind) const{
   return sblock * kSmallBlockSize + EnumCoder::select0(code, rank_sb, remain);
 }
 
-uint64_t Rsdic::select(uint64_t ind, bool bit) const{
-  if (bit) return select1(ind);
-  else return select0(ind);
-}
-
 void Rsdic::save(ostream& os) const{
   save(os, bits_);
   save(os, pointer_blocks_);

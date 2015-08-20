@@ -35,7 +35,8 @@ public:
   void clear();
   bool get_bit(uint64_t pos) const;
   uint64_t rank(uint64_t pos, bool bit) const;
-  uint64_t select(uint64_t ind, bool bit) const;
+  uint64_t select0(uint64_t ind) const;
+  uint64_t select1(uint64_t ind) const;
   std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
   void save(std::ostream& os) const;
   void load(std::istream& is);
@@ -55,12 +56,9 @@ public:
 
   bool operator == (const Rsdic& bv) const;
 
-
-private:
   friend class RsdicBuilder;
 
-  uint64_t select1(uint64_t ind) const;
-  uint64_t select0(uint64_t ind) const;
+private:
 
   template <class T>
   void save(std::ostream& os, const std::vector<T>& vs) const{
