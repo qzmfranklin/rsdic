@@ -34,6 +34,9 @@ public:
   RsdicBuilder();
   void clear();
   void push_back(bool bit);
+  std::basic_string<uint8_t> build() const;
+
+  // Deprecated
   void build(Rsdic& bitvec);
 
 private:

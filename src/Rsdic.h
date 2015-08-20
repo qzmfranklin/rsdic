@@ -34,28 +34,30 @@ public:
   ~Rsdic();
 
   void clear();
-  bool get_bit(uint64_t pos) const;
+  bool get_bit(size_t pos) const;
 
   // number of 0/1's in [0, pos - 1]
-  uint64_t rank0(uint64_t pos) const;
-  uint64_t rank1(uint64_t pos) const;
+  uint64_t rank0(size_t pos) const;
+  uint64_t rank1(size_t pos) const;
 
   // position of (ind + 1)-th 0/1
-  uint64_t select0(uint64_t ind) const;
-  uint64_t select1(uint64_t ind) const;
+  uint64_t select0(size_t ind) const;
+  uint64_t select1(size_t ind) const;
 
-  std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
+  std::pair<uint64_t, uint64_t> get_bit_and_rank(size_t pos) const;
   bool operator == (const Rsdic& bv) const;
 
+  // Allows us to load the tree quickly
+  void load(const uint8_t*, const size_t);
+
+  // Deprecated, will be removed
   void save(std::ostream &os) const;
   void load(std::istream &is);
-  //std::basic_string<uint8_t> save(FILE *fp) const;
-  //void load(const char *uint8_t, const size_t);
 
   friend class RsdicBuilder;
 
 private:
-  uint64_t _rank(uint64_t pos, bool bit) const;
+  uint64_t _rank(size_t pos, bool bit) const;
   uint64_t get_usage_bytes() const;
   uint64_t num() const{ return _num; }
   uint64_t one_num() const{ return _one_num; }

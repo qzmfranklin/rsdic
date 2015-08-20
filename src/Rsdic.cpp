@@ -48,7 +48,7 @@ void Rsdic::clear()
     _one_num = 0;
 }
 
-bool Rsdic::get_bit(uint64_t pos) const
+bool Rsdic::get_bit(size_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -61,12 +61,12 @@ bool Rsdic::get_bit(uint64_t pos) const
     return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
-uint64_t Rsdic::rank0(uint64_t pos) const
+uint64_t Rsdic::rank0(size_t pos) const
 {
     return _rank(pos, 0);
 }
 
-uint64_t Rsdic::rank1(uint64_t pos) const
+uint64_t Rsdic::rank1(size_t pos) const
 {
     return _rank(pos, 1);
 }
@@ -74,7 +74,7 @@ uint64_t Rsdic::rank1(uint64_t pos) const
 /*
  * This is not optimal, should refactor later to eliminate branches.
  */
-uint64_t Rsdic::_rank(uint64_t pos, bool bit) const
+uint64_t Rsdic::_rank(size_t pos, bool bit) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -94,7 +94,7 @@ uint64_t Rsdic::_rank(uint64_t pos, bool bit) const
     return Util::get_num(bit, rank, pos);
 }
 
-pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const
+pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(size_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -113,7 +113,7 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const
 }
 
 
-uint64_t Rsdic::select1(uint64_t ind) const
+uint64_t Rsdic::select1(size_t ind) const
 {
     uint64_t select_ind = ind / kSelectBlockSize;
     uint64_t lblock = _select_one_inds[select_ind];
@@ -136,7 +136,7 @@ uint64_t Rsdic::select1(uint64_t ind) const
     return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
 }
 
-uint64_t Rsdic::select0(uint64_t ind) const
+uint64_t Rsdic::select0(size_t ind) const
 {
     uint64_t select_ind = ind / kSelectBlockSize;
     uint64_t lblock = _select_zero_inds[select_ind];
@@ -163,14 +163,14 @@ uint64_t Rsdic::select0(uint64_t ind) const
 namespace {
 template <class T>
 void _save(std::ostream& os, const std::vector<T>& vs) {
-  uint64_t size = vs.size();
+  size_t size = vs.size();
   os.write((const char*)&size, sizeof(size));
   os.write((const char*)&vs[0], sizeof(vs[0]) * size);
 }
 
 template <class T>
 void _load(std::istream& is, std::vector<T>& vs) {
-  uint64_t size = 0;
+  size_t size = 0;
   is.read((char*)&size, sizeof(size));
   vs.resize(size);
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
