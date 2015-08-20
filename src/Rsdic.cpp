@@ -61,7 +61,20 @@ bool Rsdic::get_bit(uint64_t pos) const
     return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
-uint64_t Rsdic::rank(uint64_t pos, bool bit) const
+uint64_t Rsdic::rank0(uint64_t pos) const
+{
+    return _rank(pos, 0);
+}
+
+uint64_t Rsdic::rank1(uint64_t pos) const
+{
+    return _rank(pos, 1);
+}
+
+/*
+ * This is not optimal, should refactor later to eliminate branches.
+ */
+uint64_t Rsdic::_rank(uint64_t pos, bool bit) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -147,7 +160,24 @@ uint64_t Rsdic::select0(uint64_t ind) const
     return sblock * kSmallBlockSize + EnumCoder::select0(code, rank_sb, remain);
 }
 
-void Rsdic::save(ostream& os) const
+namespace {
+template <class T>
+void _save(std::ostream& os, const std::vector<T>& vs) {
+  uint64_t size = vs.size();
+  os.write((const char*)&size, sizeof(size));
+  os.write((const char*)&vs[0], sizeof(vs[0]) * size);
+}
+
+template <class T>
+void _load(std::istream& is, std::vector<T>& vs) {
+  uint64_t size = 0;
+  is.read((char*)&size, sizeof(size));
+  vs.resize(size);
+  is.read((char*)&vs[0], sizeof(vs[0]) * size);
+}
+} // anonymous namespace
+
+void Rsdic::save(std::ostream& os) const
 {
     _save(os, _bits);
     _save(os, _pointer_blocks);
@@ -159,7 +189,7 @@ void Rsdic::save(ostream& os) const
     os.write((const char*)&_one_num, sizeof(_one_num));
 }
 
-void Rsdic::load(istream& is)
+void Rsdic::load(std::istream& is)
 {
     _load(is, _bits);
     _load(is, _pointer_blocks);

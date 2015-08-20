@@ -56,7 +56,7 @@ TEST(Rsdic, small)
     EXPECT_EQ(n, bv.one_num());
     for (size_t i = 0; i < bv.num(); ++i) {
         EXPECT_EQ(1, bv.get_bit(i));
-        EXPECT_EQ(i, bv.rank(i, 1));
+        EXPECT_EQ(i, bv.rank1(i));
         EXPECT_EQ(i, bv.select1(i));
     }
 }
@@ -76,7 +76,7 @@ TEST(Rsdic, trivial_zero)
     EXPECT_EQ(0, bv.one_num());
     for (size_t i = 0; i < bv.num(); ++i) {
         EXPECT_EQ(0, bv.get_bit(i));
-        EXPECT_EQ(i, bv.rank(i, 0));
+        EXPECT_EQ(i, bv.rank0(i));
         EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
     }
 }
@@ -95,7 +95,7 @@ TEST(Rsdic, trivial_one)
     EXPECT_EQ(n, bv.one_num());
     for (size_t i = 0; i < bv.num(); ++i) {
         EXPECT_EQ(1, bv.get_bit(i));
-        EXPECT_EQ(i, bv.rank(i, 1)) << " i=" << i;
+        EXPECT_EQ(i, bv.rank1(i)) << " i=" << i;
         EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
     }
 }
@@ -121,11 +121,11 @@ TEST(Rsdic, random)
         std::pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
         EXPECT_EQ(B[i], bit_rank.first);
         if (B[i]) {
-            EXPECT_EQ(sum, bv.rank(i, 1));
+            EXPECT_EQ(sum, bv.rank1(i));
             EXPECT_EQ(sum, bit_rank.second);
             EXPECT_EQ(i,bv.select1(sum));
         } else {
-            EXPECT_EQ(i - sum, bv.rank(i, 0));
+            EXPECT_EQ(i - sum, bv.rank0(i));
             EXPECT_EQ(i - sum, bit_rank.second);
             EXPECT_EQ(i, bv.select1(i-sum));
         }
