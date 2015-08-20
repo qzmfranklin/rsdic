@@ -30,11 +30,11 @@ using namespace rsdic;
 
 TEST(BitVec, combination){
   for (uint64_t i = 0; i <= 64; ++i){
-    ASSERT_EQ(1, EnumCoder::kCombinationTable64_[i][i]);
+    EXPECT_EQ(1, EnumCoder::kCombinationTable64_[i][i]);
   }
   for (uint64_t i = 1; i <= 64; ++i){
     for (uint64_t j = 1; j <= i; ++j){
-      ASSERT_EQ(EnumCoder::kCombinationTable64_[i][j],
+      EXPECT_EQ(EnumCoder::kCombinationTable64_[i][j],
                 EnumCoder::kCombinationTable64_[i-1][j-1] +
                 EnumCoder::kCombinationTable64_[i-1][j]);
     }
@@ -51,12 +51,12 @@ TEST(Rsdic, small){
 
   Rsdic bv;
   bvb.build(bv);
-  ASSERT_EQ(n, bv.num());
-  ASSERT_EQ(n, bv.one_num());
+  EXPECT_EQ(n, bv.num());
+  EXPECT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(1, bv.get_bit(i));
-    ASSERT_EQ(i, bv.rank(i, 1));
-    ASSERT_EQ(i, bv.select1(i));
+    EXPECT_EQ(1, bv.get_bit(i));
+    EXPECT_EQ(i, bv.rank(i, 1));
+    EXPECT_EQ(i, bv.select1(i));
   }
 }
 
@@ -70,12 +70,12 @@ TEST(Rsdic, trivial_zero){
 
   Rsdic bv;
   bvb.build(bv);
-  ASSERT_EQ(n, bv.num());
-  ASSERT_EQ(0, bv.one_num());
+  EXPECT_EQ(n, bv.num());
+  EXPECT_EQ(0, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(0, bv.get_bit(i));
-    ASSERT_EQ(i, bv.rank(i, 0));
-    ASSERT_EQ(i, bv.select1(i)) << " i=" << i;
+    EXPECT_EQ(0, bv.get_bit(i));
+    EXPECT_EQ(i, bv.rank(i, 0));
+    EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
   }
 }
 
@@ -88,12 +88,12 @@ TEST(Rsdic, trivial_one){
 
   Rsdic bv;
   bvb.build(bv);
-  ASSERT_EQ(n, bv.num());
-  ASSERT_EQ(n, bv.one_num());
+  EXPECT_EQ(n, bv.num());
+  EXPECT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(1, bv.get_bit(i));
-    ASSERT_EQ(i, bv.rank(i, 1)) << " i=" << i;
-    ASSERT_EQ(i, bv.select1(i)) << " i=" << i;
+    EXPECT_EQ(1, bv.get_bit(i));
+    EXPECT_EQ(i, bv.rank(i, 1)) << " i=" << i;
+    EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
   }
 }
 
@@ -110,20 +110,20 @@ TEST(Rsdic, random){
 
   Rsdic bv;
   bvb.build(bv);
-  ASSERT_EQ(n, bv.num());
+  EXPECT_EQ(n, bv.num());
   int sum = 0;
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
+    EXPECT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
     pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
-    ASSERT_EQ(B[i], bit_rank.first);
+    EXPECT_EQ(B[i], bit_rank.first);
     if (B[i]){
-      ASSERT_EQ(sum, bv.rank(i, 1));
-      ASSERT_EQ(sum, bit_rank.second);
-      ASSERT_EQ(i,bv.select1(sum));
+      EXPECT_EQ(sum, bv.rank(i, 1));
+      EXPECT_EQ(sum, bit_rank.second);
+      EXPECT_EQ(i,bv.select1(sum));
     } else {
-      ASSERT_EQ(i - sum, bv.rank(i, 0));
-      ASSERT_EQ(i - sum, bit_rank.second);
-      ASSERT_EQ(i, bv.select1(i-sum));
+      EXPECT_EQ(i - sum, bv.rank(i, 0));
+      EXPECT_EQ(i - sum, bit_rank.second);
+      EXPECT_EQ(i, bv.select1(i-sum));
     }
 
     sum += B[i];
@@ -136,7 +136,7 @@ TEST(Rsdic, random){
   Rsdic bv_load;
   bv_load.load(is);
 
-  ASSERT_EQ(bv, bv_load);
+  EXPECT_EQ(bv, bv_load);
 }
 
 TEST(Rsdic, large){
@@ -156,7 +156,7 @@ TEST(Rsdic, large){
   rsdb.build(bv);
   uint64_t one_num = bv.one_num();
   for (uint64_t i = 0; i < one_num; ++i){
-    ASSERT_EQ(poses[i], bv.select1(i));
+    EXPECT_EQ(poses[i], bv.select1(i));
   }
 }
 

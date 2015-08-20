@@ -34,8 +34,8 @@ TEST(RsdicBuilder, trivial){
   rsdic::Rsdic bv;
   bvb.build(bv);
 
-  ASSERT_EQ(0, bv.num());
-  ASSERT_EQ(0, bv.one_num());
+  EXPECT_EQ(0, bv.num());
+  EXPECT_EQ(0, bv.one_num());
 }
 
 TEST(RsdicBuilder, small){
@@ -47,21 +47,21 @@ TEST(RsdicBuilder, small){
   bvb.push_back(0);
   bvb.build(bv);
   
-  ASSERT_EQ(3, bv.num());
-  ASSERT_EQ(1, bv.one_num());
+  EXPECT_EQ(3, bv.num());
+  EXPECT_EQ(1, bv.one_num());
 }
 
 TEST(RsdicBuilder, EnumCodeSmall){
   uint64_t code = rsdic::EnumCoder::encode(25, 3);
-  ASSERT_EQ(41540, code);
-  ASSERT_EQ(16, rsdic::EnumCoder::len(3));
+  EXPECT_EQ(41540, code);
+  EXPECT_EQ(16, rsdic::EnumCoder::len(3));
 }
 
 TEST(RsdicBuilder, EnumCode){
   string bits = "1110000011010011110011110110011001011111101011010111000000010010";
   uint64_t val = 0;
   uint64_t one_num = 0;
-  ASSERT_EQ(64, bits.size());
+  EXPECT_EQ(64, bits.size());
   for (size_t i = 0; i < bits.size(); ++i){
     if (bits[i] == '1'){
       val |= 1LLU << i;
@@ -70,7 +70,7 @@ TEST(RsdicBuilder, EnumCode){
   }
   uint64_t code = rsdic::EnumCoder::encode(val, one_num);
   uint64_t decoded_bits = rsdic::EnumCoder::decode(code, one_num);
-  ASSERT_EQ(val, decoded_bits);
+  EXPECT_EQ(val, decoded_bits);
 }
 
 

@@ -33,7 +33,7 @@ uint64_t pop_count(uint64_t x){
 
 TEST(EnumCoder, small){
   uint64_t code = EnumCoder::encode(0, pop_count(0));
-  ASSERT_EQ(0, EnumCoder::decode(0, code));
+  EXPECT_EQ(0, EnumCoder::decode(0, code));
 }
 
 TEST(EnumCoder, random){
@@ -41,6 +41,6 @@ TEST(EnumCoder, random){
     uint64_t x = rand();
     uint64_t rank_sb = pop_count(x);
     uint64_t code = EnumCoder::encode(x, rank_sb);
-    ASSERT_EQ(x, EnumCoder::decode(code, rank_sb));
+    EXPECT_EQ(x, EnumCoder::decode(code, rank_sb));
   }
 }

@@ -49,7 +49,7 @@ TEST(Util, Slice){
   offset = 0;
   for (uint64_t i = 0; i < vals.size(); ++i){
     uint64_t len = GetBinLen(vals[i]);
-    ASSERT_EQ(vals[i], rsdic::Util::GetSlice(bits, offset, len)) << i;
+    EXPECT_EQ(vals[i], rsdic::Util::GetSlice(bits, offset, len)) << i;
     offset += len;
   }
 }
