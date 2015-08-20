@@ -10,3 +10,11 @@ GetUsageBytes:get_usage_bytes
 RSDicBuilder:RsdicBuilder
 Select1:select1
 Select0:select0
+Encode:encode
+Decode:decode
+Len:len
+PopCount:pop_count
+SelectRaw:select_raw
+PushBack:push_back
+Build:build
+WriteBlock:write_block

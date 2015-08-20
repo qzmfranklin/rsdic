@@ -32,7 +32,7 @@ using namespace std;
 TEST(RsdicBuilder, trivial){
   rsdic::RsdicBuilder bvb;
   rsdic::Rsdic bv;
-  bvb.Build(bv);
+  bvb.build(bv);
 
   ASSERT_EQ(0, bv.num());
   ASSERT_EQ(0, bv.one_num());
@@ -42,19 +42,19 @@ TEST(RsdicBuilder, small){
   rsdic::RsdicBuilder bvb;
   rsdic::Rsdic bv;
   
-  bvb.PushBack(0);
-  bvb.PushBack(1);
-  bvb.PushBack(0);
-  bvb.Build(bv);
+  bvb.push_back(0);
+  bvb.push_back(1);
+  bvb.push_back(0);
+  bvb.build(bv);
   
   ASSERT_EQ(3, bv.num());
   ASSERT_EQ(1, bv.one_num());
 }
 
 TEST(RsdicBuilder, EnumCodeSmall){
-  uint64_t code = rsdic::EnumCoder::Encode(25, 3);
+  uint64_t code = rsdic::EnumCoder::encode(25, 3);
   ASSERT_EQ(41540, code);
-  ASSERT_EQ(16, rsdic::EnumCoder::Len(3));
+  ASSERT_EQ(16, rsdic::EnumCoder::len(3));
 }
 
 TEST(RsdicBuilder, EnumCode){
@@ -68,8 +68,8 @@ TEST(RsdicBuilder, EnumCode){
       ++ one_num;
     }
   }
-  uint64_t code = rsdic::EnumCoder::Encode(val, one_num);
-  uint64_t decoded_bits = rsdic::EnumCoder::Decode(code, one_num);
+  uint64_t code = rsdic::EnumCoder::encode(val, one_num);
+  uint64_t decoded_bits = rsdic::EnumCoder::decode(code, one_num);
   ASSERT_EQ(val, decoded_bits);
 }
 

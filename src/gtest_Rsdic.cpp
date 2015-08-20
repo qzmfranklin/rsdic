@@ -46,11 +46,11 @@ TEST(Rsdic, small){
   RsdicBuilder bvb;
   const uint64_t n = 65;
   for (int i = 0; i < n; ++i){
-    bvb.PushBack(1);
+    bvb.push_back(1);
   }
 
   Rsdic bv;
-  bvb.Build(bv);
+  bvb.build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
@@ -65,11 +65,11 @@ TEST(Rsdic, trivial_zero){
   RsdicBuilder bvb;
   const uint64_t n = 10000;
   for (int i = 0; i < n; ++i){
-    bvb.PushBack(0);
+    bvb.push_back(0);
   }
 
   Rsdic bv;
-  bvb.Build(bv);
+  bvb.build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(0, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
@@ -83,11 +83,11 @@ TEST(Rsdic, trivial_one){
   RsdicBuilder bvb;
   const uint64_t n = 10000;
   for (int i = 0; i < n; ++i){
-    bvb.PushBack(1);
+    bvb.push_back(1);
   }
 
   Rsdic bv;
-  bvb.Build(bv);
+  bvb.build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
@@ -104,12 +104,12 @@ TEST(Rsdic, random){
   const uint64_t n = 100000;
   for (int i = 0; i < n; ++i){
     int b = rand() % 2;
-    bvb.PushBack(b);
+    bvb.push_back(b);
     B.push_back(b);
   }
 
   Rsdic bv;
-  bvb.Build(bv);
+  bvb.build(bv);
   ASSERT_EQ(n, bv.num());
   int sum = 0;
   for (size_t i = 0; i < bv.num(); ++i){
@@ -146,14 +146,14 @@ TEST(Rsdic, large){
   for (uint64_t i = 0; i < n; ++i){
     float r = (float)rand() / RAND_MAX;
     if (r < 0.001) {
-      rsdb.PushBack(1);
+      rsdb.push_back(1);
       poses.push_back(i);
     }
-    else rsdb.PushBack(0);
+    else rsdb.push_back(0);
   }
 
   Rsdic bv;
-  rsdb.Build(bv);
+  rsdb.build(bv);
   uint64_t one_num = bv.one_num();
   for (uint64_t i = 0; i < one_num; ++i){
     ASSERT_EQ(poses[i], bv.select(i, 1));

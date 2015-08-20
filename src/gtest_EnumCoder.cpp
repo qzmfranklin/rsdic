@@ -23,7 +23,7 @@
 using namespace std;
 using namespace rsdic;
 
-uint64_t PopCount(uint64_t x){
+uint64_t pop_count(uint64_t x){
   uint64_t count = 0;
   for (uint64_t i = 0; i < 64; ++i){
     if ((x >> i) & 1LLU) ++count;
@@ -32,15 +32,15 @@ uint64_t PopCount(uint64_t x){
 }
 
 TEST(EnumCoder, small){
-  uint64_t code = EnumCoder::Encode(0, PopCount(0));
-  ASSERT_EQ(0, EnumCoder::Decode(0, code));
+  uint64_t code = EnumCoder::encode(0, pop_count(0));
+  ASSERT_EQ(0, EnumCoder::decode(0, code));
 }
 
 TEST(EnumCoder, random){
   for (uint64_t i = 0; i < 10000; ++i){
     uint64_t x = rand();
-    uint64_t rank_sb = PopCount(x);
-    uint64_t code = EnumCoder::Encode(x, rank_sb);
-    ASSERT_EQ(x, EnumCoder::Decode(code, rank_sb));
+    uint64_t rank_sb = pop_count(x);
+    uint64_t code = EnumCoder::encode(x, rank_sb);
+    ASSERT_EQ(x, EnumCoder::decode(code, rank_sb));
   }
 }

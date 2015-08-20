@@ -23,7 +23,7 @@
 
 namespace rsdic{
 
-uint64_t EnumCoder::Encode(uint64_t val, uint64_t rank_sb){
+uint64_t EnumCoder::encode(uint64_t val, uint64_t rank_sb){
   uint64_t code = 0;
   for (uint64_t i = 0; i < kSmallBlockSize; ++i){
     if ((val >> i) & 1LLU){
@@ -34,7 +34,7 @@ uint64_t EnumCoder::Encode(uint64_t val, uint64_t rank_sb){
   return code;
 }
 
-uint64_t EnumCoder::Decode(uint64_t code, uint64_t rank_sb){
+uint64_t EnumCoder::decode(uint64_t code, uint64_t rank_sb){
   uint64_t ret = 0;
   for (uint64_t i = 0; i < kSmallBlockSize; ++i){
     uint64_t zero_case_num =
@@ -50,7 +50,7 @@ uint64_t EnumCoder::Decode(uint64_t code, uint64_t rank_sb){
 
 
 bool EnumCoder::get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos){
-  if (Len(rank_sb) == kSmallBlockSize){
+  if (len(rank_sb) == kSmallBlockSize){
     return (code >> pos) & 1LLU;
   }
   for (uint64_t i = 0; i < pos; ++i){
@@ -64,7 +64,7 @@ bool EnumCoder::get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos){
   return (code >= kCombinationTable64_[kSmallBlockSize - pos - 1][rank_sb]);
 }
 
-uint64_t EnumCoder::PopCount(uint64_t code){
+uint64_t EnumCoder::pop_count(uint64_t code){
   uint64_t r = code;
   r = (r & 0x5555555555555555ULL) +
     ((r >> 1) & 0x5555555555555555ULL);
@@ -79,8 +79,8 @@ uint64_t EnumCoder::PopCount(uint64_t code){
 }
 
 uint64_t EnumCoder::rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
-  if (Len(rank_sb) == kSmallBlockSize){
-    return PopCount(code & ((1LLU << pos) - 1));
+  if (len(rank_sb) == kSmallBlockSize){
+    return pop_count(code & ((1LLU << pos) - 1));
   }
 
   uint64_t cur_rank = rank_sb;
@@ -95,7 +95,7 @@ uint64_t EnumCoder::rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
   return rank_sb - cur_rank;
 }
 
-uint64_t EnumCoder::SelectRaw(uint64_t code, uint64_t num){
+uint64_t EnumCoder::select_raw(uint64_t code, uint64_t num){
   uint64_t offset = 0;
   for (; offset < kSmallBlockSize; offset += 8){
     uint8_t r = kPopCount_[(code >> offset) & 0xff];
@@ -116,8 +116,8 @@ uint64_t EnumCoder::SelectRaw(uint64_t code, uint64_t num){
 }
 
 uint64_t EnumCoder::select0(uint64_t code, uint64_t rank_sb, uint64_t num){
-  if (Len(rank_sb) == kSmallBlockSize){
-    return SelectRaw(~code, num);
+  if (len(rank_sb) == kSmallBlockSize){
+    return select_raw(~code, num);
   }
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){
     uint64_t zero_case_num = kCombinationTable64_[kSmallBlockSize - offset - 1][rank_sb];
@@ -134,8 +134,8 @@ uint64_t EnumCoder::select0(uint64_t code, uint64_t rank_sb, uint64_t num){
 
 uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num){
   assert(num <= rank_sb);
-  if (Len(rank_sb) == kSmallBlockSize){
-    return SelectRaw(code, num);
+  if (len(rank_sb) == kSmallBlockSize){
+    return select_raw(code, num);
   }
 
   for (uint64_t offset = 0; offset < kSmallBlockSize; ++ offset){

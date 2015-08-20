@@ -33,11 +33,11 @@ class RsdicBuilder{
 public:
   RsdicBuilder();
   void clear();
-  void PushBack(bool bit);
-  void Build(Rsdic& bitvec);
+  void push_back(bool bit);
+  void build(Rsdic& bitvec);
 
 private:
-  void WriteBlock();
+  void write_block();
   
   std::vector<uint64_t> bits_;
   std::vector<rsdic_uint> pointer_blocks_;

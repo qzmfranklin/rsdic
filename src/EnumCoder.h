@@ -27,13 +27,13 @@ namespace rsdic{
 
 class EnumCoder{
 public:
-  static uint64_t Encode(uint64_t val, uint64_t rank_sb);
-  static uint64_t Decode(uint64_t code, uint64_t rank_sb);
+  static uint64_t encode(uint64_t val, uint64_t rank_sb);
+  static uint64_t decode(uint64_t code, uint64_t rank_sb);
   static bool get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos);
   static uint64_t rank(uint64_t code, uint64_t rank_sb, uint64_t pos);
   static uint64_t select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit);
 
-  static uint64_t Len(uint64_t rank_sb){
+  static uint64_t len(uint64_t rank_sb){
     return kEnumCodeLength_[rank_sb];
   }
 
@@ -41,8 +41,8 @@ public:
   static uint64_t select1(uint64_t code, uint64_t rank_sb, uint64_t num);
 
 private:
-  static uint64_t PopCount(uint64_t code);
-  static uint64_t SelectRaw(uint64_t code, uint64_t num);
+  static uint64_t pop_count(uint64_t code);
+  static uint64_t select_raw(uint64_t code, uint64_t num);
   static const uint8_t kPopCount_[256];
   static const uint64_t kCombinationTable64_[65][65];
   static const uint8_t kEnumCodeLength_[65];

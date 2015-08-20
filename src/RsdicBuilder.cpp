@@ -45,9 +45,9 @@ void RsdicBuilder::clear(){
   zero_num_ = 0;
 }
 
-void RsdicBuilder::PushBack(bool bit) {
+void RsdicBuilder::push_back(bool bit) {
   if (bit_num_ % kSmallBlockSize == 0){
-    WriteBlock();
+    write_block();
   }
   if (bit){
     buf_ |= (1LLU << (bit_num_ % kSmallBlockSize));
@@ -64,19 +64,19 @@ void RsdicBuilder::PushBack(bool bit) {
   ++bit_num_;
 }
 
-void RsdicBuilder::WriteBlock(){
+void RsdicBuilder::write_block(){
   if (bit_num_ > 0) {
     uint64_t rank_sb = one_num_ - prev_one_num_;
     rank_small_blocks_.push_back(rank_sb);
     prev_one_num_ = one_num_;
 
 
-    uint64_t len = EnumCoder::Len(rank_sb);
+    uint64_t len = EnumCoder::len(rank_sb);
     uint64_t code = 0;
     if (len == kSmallBlockSize){
       code = buf_; // use raw 
     } else {
-      code = EnumCoder::Encode(buf_, rank_sb);
+      code = EnumCoder::encode(buf_, rank_sb);
     }
     uint64_t new_size =  Util::Floor(offset_ + len, kSmallBlockSize);
     if (new_size > bits_.size()) {
@@ -93,10 +93,10 @@ void RsdicBuilder::WriteBlock(){
 }
 
 
-void RsdicBuilder::Build(Rsdic& bv){
+void RsdicBuilder::build(Rsdic& bv){
   bv.clear();
   if (bit_num_ == 0) return;
-  WriteBlock();
+  write_block();
   bv.num_ = bit_num_;
   bv.one_num_ = one_num_;
   // use copy instead of swap to allocate adequate working space

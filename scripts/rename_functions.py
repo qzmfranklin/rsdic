@@ -30,7 +30,7 @@ if __name__ == '__main__':
         cmd = [
                 'git', 'grep', '-l',
                 shlex.quote(old),
-                'lib/',
+                'src/',
                 '|',
                 'xargs', 'sed', '-i', "''",
                 "'{}'".format(
