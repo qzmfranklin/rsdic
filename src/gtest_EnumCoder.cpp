@@ -22,24 +22,27 @@
 
 using namespace rsdic;
 
-uint64_t pop_count(uint64_t x){
-  uint64_t count = 0;
-  for (uint64_t i = 0; i < 64; ++i){
-    if ((x >> i) & 1LLU) ++count;
-  }
-  return count;
+uint64_t pop_count(uint64_t x)
+{
+    uint64_t count = 0;
+    for (uint64_t i = 0; i < 64; ++i) {
+        if ((x >> i) & 1LLU) ++count;
+    }
+    return count;
 }
 
-TEST(EnumCoder, small){
-  uint64_t code = EnumCoder::encode(0, pop_count(0));
-  EXPECT_EQ(0, EnumCoder::decode(0, code));
+TEST(EnumCoder, small)
+{
+    uint64_t code = EnumCoder::encode(0, pop_count(0));
+    EXPECT_EQ(0, EnumCoder::decode(0, code));
 }
 
-TEST(EnumCoder, random){
-  for (uint64_t i = 0; i < 10000; ++i){
-    uint64_t x = rand();
-    uint64_t rank_sb = pop_count(x);
-    uint64_t code = EnumCoder::encode(x, rank_sb);
-    EXPECT_EQ(x, EnumCoder::decode(code, rank_sb));
-  }
+TEST(EnumCoder, random)
+{
+    for (uint64_t i = 0; i < 10000; ++i) {
+        uint64_t x = rand();
+        uint64_t rank_sb = pop_count(x);
+        uint64_t code = EnumCoder::encode(x, rank_sb);
+        EXPECT_EQ(x, EnumCoder::decode(code, rank_sb));
+    }
 }

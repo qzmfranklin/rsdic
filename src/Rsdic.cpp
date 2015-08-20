@@ -25,172 +25,185 @@
 
 using namespace std;
 
-namespace rsdic{
+namespace rsdic
+{
 
-Rsdic::Rsdic() : num_(0), one_num_(0){
+Rsdic::Rsdic() : num_(0), one_num_(0)
+{
 }
 
-Rsdic::~Rsdic(){
+Rsdic::~Rsdic()
+{
 }
 
-void Rsdic::clear() {
-  bits_.clear();
-  pointer_blocks_.clear();
-  rank_blocks_.clear();
-  select_one_inds_.clear();
-  select_zero_inds_.clear();
-  rank_small_blocks_.clear();
-  num_ = 0;
-  one_num_ = 0;
+void Rsdic::clear()
+{
+    bits_.clear();
+    pointer_blocks_.clear();
+    rank_blocks_.clear();
+    select_one_inds_.clear();
+    select_zero_inds_.clear();
+    rank_small_blocks_.clear();
+    num_ = 0;
+    one_num_ = 0;
 }
 
-bool Rsdic::get_bit(uint64_t pos) const{
-  uint64_t lblock = pos / kLargeBlockSize;
-  uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t sblock = pos / kSmallBlockSize;
-  for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i){
-    pointer += EnumCoder::len(rank_small_blocks_[i]);
-  }
-  uint64_t rank_sb = rank_small_blocks_[sblock];
-  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
-  return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
+bool Rsdic::get_bit(uint64_t pos) const
+{
+    uint64_t lblock = pos / kLargeBlockSize;
+    uint64_t pointer = pointer_blocks_[lblock];
+    uint64_t sblock = pos / kSmallBlockSize;
+    for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
+        pointer += EnumCoder::len(rank_small_blocks_[i]);
+    }
+    uint64_t rank_sb = rank_small_blocks_[sblock];
+    uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
+    return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
-uint64_t Rsdic::rank(uint64_t pos, bool bit) const{
-  uint64_t lblock = pos / kLargeBlockSize;
-  uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t sblock = pos / kSmallBlockSize;
-  uint64_t rank = rank_blocks_[lblock];
-  for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i){
-    uint64_t rank_sb = rank_small_blocks_[i];
-    rank += rank_sb;
-    pointer += EnumCoder::len(rank_sb);
-  }
-  if (pos % kSmallBlockSize == 0){
+uint64_t Rsdic::rank(uint64_t pos, bool bit) const
+{
+    uint64_t lblock = pos / kLargeBlockSize;
+    uint64_t pointer = pointer_blocks_[lblock];
+    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t rank = rank_blocks_[lblock];
+    for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
+        uint64_t rank_sb = rank_small_blocks_[i];
+        rank += rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    if (pos % kSmallBlockSize == 0) {
+        return Util::GetNum(bit, rank, pos);
+    }
+    uint64_t rank_sb = rank_small_blocks_[sblock];
+    uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
+    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
     return Util::GetNum(bit, rank, pos);
-  }
-  uint64_t rank_sb = rank_small_blocks_[sblock];
-  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
-  rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-  return Util::GetNum(bit, rank, pos);
 }
 
-pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const{
-  uint64_t lblock = pos / kLargeBlockSize;
-  uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t sblock = pos / kSmallBlockSize;
-  uint64_t rank = rank_blocks_[lblock];
-  for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i){
-    uint64_t rank_sb = rank_small_blocks_[i];
-    rank += rank_sb;
-    pointer += EnumCoder::len(rank_sb);
-  }
-  uint64_t rank_sb = rank_small_blocks_[sblock];
-  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
-  rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-  uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
-  return make_pair(ret_bit, Util::GetNum(ret_bit, rank, pos));
+pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const
+{
+    uint64_t lblock = pos / kLargeBlockSize;
+    uint64_t pointer = pointer_blocks_[lblock];
+    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t rank = rank_blocks_[lblock];
+    for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
+        uint64_t rank_sb = rank_small_blocks_[i];
+        rank += rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    uint64_t rank_sb = rank_small_blocks_[sblock];
+    uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
+    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
+    uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
+    return make_pair(ret_bit, Util::GetNum(ret_bit, rank, pos));
 }
 
 
-uint64_t Rsdic::select1(uint64_t ind) const{
-  uint64_t select_ind = ind / kSelectBlockSize;
-  uint64_t lblock = select_one_inds_[select_ind];
-  for (; lblock < rank_blocks_.size(); ++lblock){
-    if (ind < rank_blocks_[lblock]) break;
-  }
-  --lblock;
-  uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
-  uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t remain = ind - rank_blocks_[lblock] + 1;
+uint64_t Rsdic::select1(uint64_t ind) const
+{
+    uint64_t select_ind = ind / kSelectBlockSize;
+    uint64_t lblock = select_one_inds_[select_ind];
+    for (; lblock < rank_blocks_.size(); ++lblock) {
+        if (ind < rank_blocks_[lblock]) break;
+    }
+    --lblock;
+    uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
+    uint64_t pointer = pointer_blocks_[lblock];
+    uint64_t remain = ind - rank_blocks_[lblock] + 1;
 
-  for (; sblock < rank_small_blocks_.size(); ++sblock){
-    const uint64_t rank_sb = rank_small_blocks_[sblock];
-    if (remain <= rank_sb) break;
-    remain -= rank_sb;
-    pointer += EnumCoder::len(rank_sb);
-  }
-  uint64_t rank_sb = rank_small_blocks_[sblock];
-  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
-  return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
+    for (; sblock < rank_small_blocks_.size(); ++sblock) {
+        const uint64_t rank_sb = rank_small_blocks_[sblock];
+        if (remain <= rank_sb) break;
+        remain -= rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    uint64_t rank_sb = rank_small_blocks_[sblock];
+    uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
+    return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
 }
 
-uint64_t Rsdic::select0(uint64_t ind) const{
-  uint64_t select_ind = ind / kSelectBlockSize;
-  uint64_t lblock = select_zero_inds_[select_ind];
-  for (; lblock < rank_blocks_.size(); ++lblock){
-    if (lblock * kLargeBlockSize - rank_blocks_[lblock] > ind) break;
-  }
-  --lblock;
+uint64_t Rsdic::select0(uint64_t ind) const
+{
+    uint64_t select_ind = ind / kSelectBlockSize;
+    uint64_t lblock = select_zero_inds_[select_ind];
+    for (; lblock < rank_blocks_.size(); ++lblock) {
+        if (lblock * kLargeBlockSize - rank_blocks_[lblock] > ind) break;
+    }
+    --lblock;
 
-  uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
-  uint64_t pointer = pointer_blocks_[lblock];
-  uint64_t remain = ind - lblock * kLargeBlockSize + rank_blocks_[lblock] + 1;
+    uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
+    uint64_t pointer = pointer_blocks_[lblock];
+    uint64_t remain = ind - lblock * kLargeBlockSize + rank_blocks_[lblock] + 1;
 
-  for (; sblock < rank_small_blocks_.size(); ++sblock){
-    const uint64_t rank_sb = kSmallBlockSize - rank_small_blocks_[sblock];
-    if (remain <= rank_sb) break;
-    remain -= rank_sb;
-    pointer += EnumCoder::len(rank_sb);
-  }
-  uint64_t rank_sb = rank_small_blocks_[sblock];
-  uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
-  return sblock * kSmallBlockSize + EnumCoder::select0(code, rank_sb, remain);
+    for (; sblock < rank_small_blocks_.size(); ++sblock) {
+        const uint64_t rank_sb = kSmallBlockSize - rank_small_blocks_[sblock];
+        if (remain <= rank_sb) break;
+        remain -= rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    uint64_t rank_sb = rank_small_blocks_[sblock];
+    uint64_t code = Util::GetSlice(bits_, pointer, EnumCoder::len(rank_sb));
+    return sblock * kSmallBlockSize + EnumCoder::select0(code, rank_sb, remain);
 }
 
-void Rsdic::save(ostream& os) const{
-  save(os, bits_);
-  save(os, pointer_blocks_);
-  save(os, rank_blocks_);
-  save(os, select_one_inds_);
-  save(os, select_zero_inds_);
-  save(os, rank_small_blocks_);
-  os.write((const char*)&num_, sizeof(num_));
-  os.write((const char*)&one_num_, sizeof(one_num_));
+void Rsdic::save(ostream& os) const
+{
+    save(os, bits_);
+    save(os, pointer_blocks_);
+    save(os, rank_blocks_);
+    save(os, select_one_inds_);
+    save(os, select_zero_inds_);
+    save(os, rank_small_blocks_);
+    os.write((const char*)&num_, sizeof(num_));
+    os.write((const char*)&one_num_, sizeof(one_num_));
 }
 
-void Rsdic::load(istream& is){
-  load(is, bits_);
-  load(is, pointer_blocks_);
-  load(is, rank_blocks_);
-  load(is, select_one_inds_);
-  load(is, select_zero_inds_);
-  load(is, rank_small_blocks_);
-  is.read((char*)&num_, sizeof(num_));
-  is.read((char*)&one_num_, sizeof(one_num_));
+void Rsdic::load(istream& is)
+{
+    load(is, bits_);
+    load(is, pointer_blocks_);
+    load(is, rank_blocks_);
+    load(is, select_one_inds_);
+    load(is, select_zero_inds_);
+    load(is, rank_small_blocks_);
+    is.read((char*)&num_, sizeof(num_));
+    is.read((char*)&one_num_, sizeof(one_num_));
 }
 
-uint64_t Rsdic::get_usage_bytes() const{
-  /*
-  cout << endl
-       << "bits:" << bits_.size() * sizeof(bits_[0]) << endl
-       << " ptb:" << pointer_blocks_.size() * sizeof(pointer_blocks_[0]) << endl
-       << "  rb:" << rank_blocks_.size() * sizeof(rank_blocks_[0]) << endl
-       << " soi:" << select_one_inds_.size() * sizeof(select_one_inds_[0]) << endl
-       << " soz:" <<     select_zero_inds_.size() * sizeof(select_zero_inds_[0]) << endl
-       << " rsb:" <<     rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) << endl;
-  */
-  return
-    bits_.size() * sizeof(bits_[0]) +
-    pointer_blocks_.size() * sizeof(pointer_blocks_[0]) +
-    rank_blocks_.size() * sizeof(rank_blocks_[0]) +
-    select_one_inds_.size() * sizeof(select_one_inds_[0]) +
-    select_zero_inds_.size() * sizeof(select_zero_inds_[0]) +
-    rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) +
-    sizeof(num_) +
-    sizeof(one_num_);
+uint64_t Rsdic::get_usage_bytes() const
+{
+    /*
+    cout << endl
+         << "bits:" << bits_.size() * sizeof(bits_[0]) << endl
+         << " ptb:" << pointer_blocks_.size() * sizeof(pointer_blocks_[0]) << endl
+         << "  rb:" << rank_blocks_.size() * sizeof(rank_blocks_[0]) << endl
+         << " soi:" << select_one_inds_.size() * sizeof(select_one_inds_[0]) << endl
+         << " soz:" <<     select_zero_inds_.size() * sizeof(select_zero_inds_[0]) << endl
+         << " rsb:" <<     rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) << endl;
+    */
+    return
+        bits_.size() * sizeof(bits_[0]) +
+        pointer_blocks_.size() * sizeof(pointer_blocks_[0]) +
+        rank_blocks_.size() * sizeof(rank_blocks_[0]) +
+        select_one_inds_.size() * sizeof(select_one_inds_[0]) +
+        select_zero_inds_.size() * sizeof(select_zero_inds_[0]) +
+        rank_small_blocks_.size() * sizeof(rank_small_blocks_[0]) +
+        sizeof(num_) +
+        sizeof(one_num_);
 }
 
-bool Rsdic::operator == (const Rsdic& bv) const{
-  return
-    bits_ == bv.bits_ &&
-    pointer_blocks_ == bv.pointer_blocks_ &&
-    rank_blocks_ == bv.rank_blocks_ &&
-    select_one_inds_ == bv.select_one_inds_ &&
-    select_zero_inds_ == bv.select_zero_inds_ &&
-    rank_small_blocks_ == bv.rank_small_blocks_ &&
-    num_ == bv.num_ &&
-    one_num_ == bv.one_num_;
+bool Rsdic::operator == (const Rsdic& bv) const
+{
+    return
+        bits_ == bv.bits_ &&
+        pointer_blocks_ == bv.pointer_blocks_ &&
+        rank_blocks_ == bv.rank_blocks_ &&
+        select_one_inds_ == bv.select_one_inds_ &&
+        select_zero_inds_ == bv.select_zero_inds_ &&
+        rank_small_blocks_ == bv.rank_small_blocks_ &&
+        num_ == bv.num_ &&
+        one_num_ == bv.one_num_;
 }
 
 
