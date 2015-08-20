@@ -26,15 +26,15 @@
 
 namespace rsdic{
 
-class RSDic;
+class Rsdic;
 
-class RSDicBuilder{
+class RsdicBuilder{
 
 public:
-  RSDicBuilder();
-  void Clear();
+  RsdicBuilder();
+  void clear();
   void PushBack(bool bit);
-  void Build(RSDic& bitvec);
+  void Build(Rsdic& bitvec);
 
 private:
   void WriteBlock();

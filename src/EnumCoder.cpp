@@ -49,7 +49,7 @@ uint64_t EnumCoder::Decode(uint64_t code, uint64_t rank_sb){
 }
 
 
-bool EnumCoder::GetBit(uint64_t code, uint64_t rank_sb, uint64_t pos){
+bool EnumCoder::get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos){
   if (Len(rank_sb) == kSmallBlockSize){
     return (code >> pos) & 1LLU;
   }
@@ -78,7 +78,7 @@ uint64_t EnumCoder::PopCount(uint64_t code){
 
 }
 
-uint64_t EnumCoder::Rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
+uint64_t EnumCoder::rank(uint64_t code, uint64_t rank_sb, uint64_t pos){
   if (Len(rank_sb) == kSmallBlockSize){
     return PopCount(code & ((1LLU << pos) - 1));
   }
@@ -115,7 +115,7 @@ uint64_t EnumCoder::SelectRaw(uint64_t code, uint64_t num){
   assert(false);
 }
 
-uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
+uint64_t EnumCoder::select0(uint64_t code, uint64_t rank_sb, uint64_t num){
   if (Len(rank_sb) == kSmallBlockSize){
     return SelectRaw(~code, num);
   }
@@ -132,7 +132,7 @@ uint64_t EnumCoder::Select0(uint64_t code, uint64_t rank_sb, uint64_t num){
   assert(false);
 }
 
-uint64_t EnumCoder::Select1(uint64_t code, uint64_t rank_sb, uint64_t num){
+uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num){
   assert(num <= rank_sb);
   if (Len(rank_sb) == kSmallBlockSize){
     return SelectRaw(code, num);
@@ -150,10 +150,10 @@ uint64_t EnumCoder::Select1(uint64_t code, uint64_t rank_sb, uint64_t num){
   assert(false);
 }
 
-uint64_t EnumCoder::Select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit){
+uint64_t EnumCoder::select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit){
   if (num == 0) return 0;
-  if (bit) return Select1(code, rank_sb, num);
-  else return Select0(code, rank_sb, num);
+  if (bit) return select1(code, rank_sb, num);
+  else return select0(code, rank_sb, num);
 }
 
 const uint8_t EnumCoder::kEnumCodeLength_[65] = {

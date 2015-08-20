@@ -23,24 +23,24 @@
 #include "EnumCoder.hpp"
 
 #define private public
-#include "RSDic.hpp"
-#include "RSDicBuilder.hpp"
+#include "Rsdic.hpp"
+#include "RsdicBuilder.hpp"
 
 
 using namespace std;
 
-TEST(RSDicBuilder, trivial){
-  rsdic::RSDicBuilder bvb;
-  rsdic::RSDic bv;
+TEST(RsdicBuilder, trivial){
+  rsdic::RsdicBuilder bvb;
+  rsdic::Rsdic bv;
   bvb.Build(bv);
 
   ASSERT_EQ(0, bv.num());
   ASSERT_EQ(0, bv.one_num());
 }
 
-TEST(RSDicBuilder, small){
-  rsdic::RSDicBuilder bvb;
-  rsdic::RSDic bv;
+TEST(RsdicBuilder, small){
+  rsdic::RsdicBuilder bvb;
+  rsdic::Rsdic bv;
   
   bvb.PushBack(0);
   bvb.PushBack(1);
@@ -51,13 +51,13 @@ TEST(RSDicBuilder, small){
   ASSERT_EQ(1, bv.one_num());
 }
 
-TEST(RSDicBuilder, EnumCodeSmall){
+TEST(RsdicBuilder, EnumCodeSmall){
   uint64_t code = rsdic::EnumCoder::Encode(25, 3);
   ASSERT_EQ(41540, code);
   ASSERT_EQ(16, rsdic::EnumCoder::Len(3));
 }
 
-TEST(RSDicBuilder, EnumCode){
+TEST(RsdicBuilder, EnumCode){
   string bits = "1110000011010011110011110110011001011111101011010111000000010010";
   uint64_t val = 0;
   uint64_t one_num = 0;

@@ -27,19 +27,19 @@
 
 namespace rsdic{
 
-class RSDic{
+class Rsdic{
 public:
-  RSDic();
-  ~RSDic();
+  Rsdic();
+  ~Rsdic();
 
-  void Clear();
-  bool GetBit(uint64_t pos) const;
-  uint64_t Rank(uint64_t pos, bool bit) const;
-  uint64_t Select(uint64_t ind, bool bit) const;
-  std::pair<uint64_t, uint64_t> GetBitAndRank(uint64_t pos) const;
-  void Save(std::ostream& os) const;
-  void Load(std::istream& is);
-  uint64_t GetUsageBytes() const;
+  void clear();
+  bool get_bit(uint64_t pos) const;
+  uint64_t rank(uint64_t pos, bool bit) const;
+  uint64_t select(uint64_t ind, bool bit) const;
+  std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
+  void save(std::ostream& os) const;
+  void load(std::istream& is);
+  uint64_t get_usage_bytes() const;
 
   uint64_t num() const{
     return num_;
@@ -53,24 +53,24 @@ public:
     return num_ - one_num_;
   }
 
-  bool operator == (const RSDic& bv) const;
+  bool operator == (const Rsdic& bv) const;
 
 
 private:
-  friend class RSDicBuilder;
+  friend class RsdicBuilder;
 
-  uint64_t Select1(uint64_t ind) const;
-  uint64_t Select0(uint64_t ind) const;
+  uint64_t select1(uint64_t ind) const;
+  uint64_t select0(uint64_t ind) const;
 
   template <class T>
-  void Save(std::ostream& os, const std::vector<T>& vs) const{
+  void save(std::ostream& os, const std::vector<T>& vs) const{
     uint64_t size = vs.size();
     os.write((const char*)&size, sizeof(size));
     os.write((const char*)&vs[0], sizeof(vs[0]) * size);
   }
 
   template <class T>
-  void Load(std::istream& is, std::vector<T>& vs){
+  void load(std::istream& is, std::vector<T>& vs){
     uint64_t size = 0;
     is.read((char*)&size, sizeof(size));
     vs.resize(size);

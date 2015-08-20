@@ -29,16 +29,16 @@ class EnumCoder{
 public:
   static uint64_t Encode(uint64_t val, uint64_t rank_sb);
   static uint64_t Decode(uint64_t code, uint64_t rank_sb);
-  static bool GetBit(uint64_t code, uint64_t rank_sb, uint64_t pos);
-  static uint64_t Rank(uint64_t code, uint64_t rank_sb, uint64_t pos);
-  static uint64_t Select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit);
+  static bool get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos);
+  static uint64_t rank(uint64_t code, uint64_t rank_sb, uint64_t pos);
+  static uint64_t select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit);
 
   static uint64_t Len(uint64_t rank_sb){
     return kEnumCodeLength_[rank_sb];
   }
 
-  static uint64_t Select0(uint64_t code, uint64_t rank_sb, uint64_t num);
-  static uint64_t Select1(uint64_t code, uint64_t rank_sb, uint64_t num);
+  static uint64_t select0(uint64_t code, uint64_t rank_sb, uint64_t num);
+  static uint64_t select1(uint64_t code, uint64_t rank_sb, uint64_t num);
 
 private:
   static uint64_t PopCount(uint64_t code);

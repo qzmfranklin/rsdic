@@ -17,20 +17,20 @@
  *      software without specific prior written permission.
  */
 
-#include "RSDic.hpp"
+#include "Rsdic.hpp"
 #include "Const.hpp"
 #include "Util.hpp"
 #include "EnumCoder.hpp"
-#include "RSDicBuilder.hpp"
+#include "RsdicBuilder.hpp"
 
 using namespace std;
 
 namespace rsdic{
 
-RSDicBuilder::RSDicBuilder() : buf_(0), offset_(0), bit_num_(0), one_num_(0), prev_one_num_(0), zero_num_(0) {
+RsdicBuilder::RsdicBuilder() : buf_(0), offset_(0), bit_num_(0), one_num_(0), prev_one_num_(0), zero_num_(0) {
 }
 
-void RSDicBuilder::Clear(){
+void RsdicBuilder::clear(){
   bits_.clear();
   pointer_blocks_.clear();
   select_one_inds_.clear();
@@ -45,7 +45,7 @@ void RSDicBuilder::Clear(){
   zero_num_ = 0;
 }
 
-void RSDicBuilder::PushBack(bool bit) {
+void RsdicBuilder::PushBack(bool bit) {
   if (bit_num_ % kSmallBlockSize == 0){
     WriteBlock();
   }
@@ -64,7 +64,7 @@ void RSDicBuilder::PushBack(bool bit) {
   ++bit_num_;
 }
 
-void RSDicBuilder::WriteBlock(){
+void RsdicBuilder::WriteBlock(){
   if (bit_num_ > 0) {
     uint64_t rank_sb = one_num_ - prev_one_num_;
     rank_small_blocks_.push_back(rank_sb);
@@ -93,8 +93,8 @@ void RSDicBuilder::WriteBlock(){
 }
 
 
-void RSDicBuilder::Build(RSDic& bv){
-  bv.Clear();
+void RsdicBuilder::Build(Rsdic& bv){
+  bv.clear();
   if (bit_num_ == 0) return;
   WriteBlock();
   bv.num_ = bit_num_;

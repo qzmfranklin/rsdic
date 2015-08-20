@@ -1,0 +1,12 @@
+GetBit:get_bit
+Rank:rank
+Select:select
+RSDic:Rsdic
+Clear:clear
+GetBitAndRank:get_bit_and_rank
+Save:save
+Load:load
+GetUsageBytes:get_usage_bytes
+RSDicBuilder:RsdicBuilder
+Select1:select1
+Select0:select0

@@ -18,10 +18,10 @@
  */
 
 #include <gtest/gtest.h>
-#include "RSDicBuilder.hpp"
+#include "RsdicBuilder.hpp"
 
 #define private public
-#include "RSDic.hpp"
+#include "Rsdic.hpp"
 #include "EnumCoder.hpp"
 
 
@@ -42,64 +42,64 @@ TEST(BitVec, combination){
 }
 
 
-TEST(RSDic, small){
-  RSDicBuilder bvb;
+TEST(Rsdic, small){
+  RsdicBuilder bvb;
   const uint64_t n = 65;
   for (int i = 0; i < n; ++i){
     bvb.PushBack(1);
   }
 
-  RSDic bv;
+  Rsdic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(1, bv.GetBit(i));
-    ASSERT_EQ(i, bv.Rank(i, 1));
-    ASSERT_EQ(i, bv.Select(i, 1));
+    ASSERT_EQ(1, bv.get_bit(i));
+    ASSERT_EQ(i, bv.rank(i, 1));
+    ASSERT_EQ(i, bv.select(i, 1));
   }
 }
 
 
-TEST(RSDic, trivial_zero){
-  RSDicBuilder bvb;
+TEST(Rsdic, trivial_zero){
+  RsdicBuilder bvb;
   const uint64_t n = 10000;
   for (int i = 0; i < n; ++i){
     bvb.PushBack(0);
   }
 
-  RSDic bv;
+  Rsdic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(0, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(0, bv.GetBit(i));
-    ASSERT_EQ(i, bv.Rank(i, 0));
-    ASSERT_EQ(i, bv.Select(i, 0)) << " i=" << i;
+    ASSERT_EQ(0, bv.get_bit(i));
+    ASSERT_EQ(i, bv.rank(i, 0));
+    ASSERT_EQ(i, bv.select(i, 0)) << " i=" << i;
   }
 }
 
-TEST(RSDic, trivial_one){
-  RSDicBuilder bvb;
+TEST(Rsdic, trivial_one){
+  RsdicBuilder bvb;
   const uint64_t n = 10000;
   for (int i = 0; i < n; ++i){
     bvb.PushBack(1);
   }
 
-  RSDic bv;
+  Rsdic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
   ASSERT_EQ(n, bv.one_num());
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(1, bv.GetBit(i));
-    ASSERT_EQ(i, bv.Rank(i, 1)) << " i=" << i;
-    ASSERT_EQ(i, bv.Select(i, 1)) << " i=" << i;
+    ASSERT_EQ(1, bv.get_bit(i));
+    ASSERT_EQ(i, bv.rank(i, 1)) << " i=" << i;
+    ASSERT_EQ(i, bv.select(i, 1)) << " i=" << i;
   }
 }
 
 
-TEST(RSDic, random){
-  RSDicBuilder bvb;
+TEST(Rsdic, random){
+  RsdicBuilder bvb;
   vector<int> B;
   const uint64_t n = 100000;
   for (int i = 0; i < n; ++i){
@@ -108,39 +108,39 @@ TEST(RSDic, random){
     B.push_back(b);
   }
 
-  RSDic bv;
+  Rsdic bv;
   bvb.Build(bv);
   ASSERT_EQ(n, bv.num());
   int sum = 0;
   for (size_t i = 0; i < bv.num(); ++i){
-    ASSERT_EQ(B[i]  , bv.GetBit(i)) << " i=" << i;
-    pair<uint64_t, uint64_t> bit_rank = bv.GetBitAndRank(i);
+    ASSERT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
+    pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
     ASSERT_EQ(B[i], bit_rank.first);
     if (B[i]){
-      ASSERT_EQ(sum, bv.Rank(i, 1));
+      ASSERT_EQ(sum, bv.rank(i, 1));
       ASSERT_EQ(sum, bit_rank.second);
-      ASSERT_EQ(i,bv.Select(sum, 1));
+      ASSERT_EQ(i,bv.select(sum, 1));
     } else {
-      ASSERT_EQ(i - sum, bv.Rank(i, 0));
+      ASSERT_EQ(i - sum, bv.rank(i, 0));
       ASSERT_EQ(i - sum, bit_rank.second);
-      ASSERT_EQ(i, bv.Select(i-sum, 0));
+      ASSERT_EQ(i, bv.select(i-sum, 0));
     }
 
     sum += B[i];
   }
 
   ostringstream os;
-  bv.Save(os);
+  bv.save(os);
   istringstream is(os.str());
 
-  RSDic bv_load;
-  bv_load.Load(is);
+  Rsdic bv_load;
+  bv_load.load(is);
 
   ASSERT_EQ(bv, bv_load);
 }
 
-TEST(RSDic, large){
-  RSDicBuilder rsdb;
+TEST(Rsdic, large){
+  RsdicBuilder rsdb;
   const uint64_t n = 26843545;
   vector<uint64_t> poses;
   for (uint64_t i = 0; i < n; ++i){
@@ -152,11 +152,11 @@ TEST(RSDic, large){
     else rsdb.PushBack(0);
   }
 
-  RSDic bv;
+  Rsdic bv;
   rsdb.Build(bv);
   uint64_t one_num = bv.one_num();
   for (uint64_t i = 0; i < one_num; ++i){
-    ASSERT_EQ(poses[i], bv.Select(i, 1));
+    ASSERT_EQ(poses[i], bv.select(i, 1));
   }
 }
 
