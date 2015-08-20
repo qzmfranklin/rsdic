@@ -56,11 +56,35 @@ public:
     return (num + div - 1) / div;
   }
 
-  static uint64_t get_num(bool bit, uint64_t num, uint64_t total) {
-    if (bit) return num;
-    else return total - num;
+  static void write_2bytes(void *buf, const uint16_t num) {
+      uint8_t *ptr = reinterpret_cast<uint8_t*>(buf);
+      ptr[0] = (0xFF00u & num) >> 8;
+      ptr[1] =  0x00FFu & num;
   }
 
+  static void write_4bytes(void *buf, const uint32_t num) {
+      uint8_t *ptr = reinterpret_cast<uint8_t*>(buf);
+      ptr[0] = (0xFF000000u & num) >> 24;
+      ptr[1] = (0x00FF0000u & num) >> 16;
+      ptr[2] = (0x0000FF00u & num) >> 8;
+      ptr[3] =  0x000000FFu & num;
+  }
+
+  static uint16_t read_2bytes(const void *buf) {
+      const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
+      const uint16_t upper = ptr[0];
+      const uint16_t lower = ptr[1];
+      return (upper << 8u) | lower;
+  }
+
+  static uint32_t read_4bytes(const void *buf) {
+      const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
+      const uint32_t tmp0 = ptr[0];
+      const uint32_t tmp1 = ptr[1];
+      const uint32_t tmp2 = ptr[2];
+      const uint32_t tmp3 = ptr[3];
+      return (tmp0 << 24u) | (tmp1 << 16u) | (tmp2 << 8u) | tmp3;
+  }
 
 };
 

@@ -63,18 +63,25 @@ bool Rsdic::get_bit(size_t pos) const
 
 uint64_t Rsdic::rank0(size_t pos) const
 {
-    return _rank(pos, 0);
+    uint64_t lblock = pos / kLargeBlockSize;
+    uint64_t pointer = _pointer_blocks[lblock];
+    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t rank = _rank_blocks[lblock];
+    for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
+        uint64_t rank_sb = _rank_small_blocks[i];
+        rank += rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    if (pos % kSmallBlockSize == 0) {
+        return pos - rank;
+    }
+    uint64_t rank_sb = _rank_small_blocks[sblock];
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
+    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
+    return pos - rank;
 }
 
 uint64_t Rsdic::rank1(size_t pos) const
-{
-    return _rank(pos, 1);
-}
-
-/*
- * This is not optimal, should refactor later to eliminate branches.
- */
-uint64_t Rsdic::_rank(size_t pos, bool bit) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -86,12 +93,12 @@ uint64_t Rsdic::_rank(size_t pos, bool bit) const
         pointer += EnumCoder::len(rank_sb);
     }
     if (pos % kSmallBlockSize == 0) {
-        return Util::get_num(bit, rank, pos);
+        return rank;
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-    return Util::get_num(bit, rank, pos);
+    return rank;
 }
 
 pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(size_t pos) const
@@ -109,7 +116,7 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(size_t pos) const
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
     uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
-    return make_pair(ret_bit, Util::get_num(ret_bit, rank, pos));
+    return make_pair(ret_bit, ret_bit ? rank : pos - rank);
 }
 
 
@@ -161,22 +168,28 @@ uint64_t Rsdic::select0(size_t ind) const
 }
 
 namespace {
-template <class T>
+template <typename T>
 void _save(std::ostream& os, const std::vector<T>& vs) {
   size_t size = vs.size();
   os.write((const char*)&size, sizeof(size));
   os.write((const char*)&vs[0], sizeof(vs[0]) * size);
 }
 
-template <class T>
+template <typename T>
 void _load(std::istream& is, std::vector<T>& vs) {
   size_t size = 0;
   is.read((char*)&size, sizeof(size));
   vs.resize(size);
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
 }
+
+template <typename T>
+void _load(const void *buf, const size_t len) {
+}
+
 } // anonymous namespace
 
+// Deprecated
 void Rsdic::save(std::ostream& os) const
 {
     _save(os, _bits);
@@ -189,6 +202,7 @@ void Rsdic::save(std::ostream& os) const
     os.write((const char*)&_one_num, sizeof(_one_num));
 }
 
+// Deprecated
 void Rsdic::load(std::istream& is)
 {
     _load(is, _bits);

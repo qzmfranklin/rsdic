@@ -48,7 +48,7 @@ public:
   bool operator == (const Rsdic& bv) const;
 
   // Allows us to load the tree quickly
-  void load(const uint8_t*, const size_t);
+  void load(const void*, const size_t);
 
   // Deprecated, will be removed
   void save(std::ostream &os) const;
@@ -57,7 +57,6 @@ public:
   friend class RsdicBuilder;
 
 private:
-  uint64_t _rank(size_t pos, bool bit) const;
   uint64_t get_usage_bytes() const;
   uint64_t num() const{ return _num; }
   uint64_t one_num() const{ return _one_num; }
