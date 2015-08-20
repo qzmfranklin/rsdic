@@ -18,3 +18,7 @@ SelectRaw:select_raw
 PushBack:push_back
 Build:build
 WriteBlock:write_block
+GetSlice:get_slice
+SetSlice:set_slice
+Floor:floor
+GetNum:get_num

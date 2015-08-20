@@ -83,11 +83,11 @@ void RsdicBuilder::write_block()
         } else {
             code = EnumCoder::encode(_buf, rank_sb);
         }
-        uint64_t new_size =  Util::Floor(_offset + len, kSmallBlockSize);
+        uint64_t new_size =  Util::floor(_offset + len, kSmallBlockSize);
         if (new_size > _bits.size()) {
             _bits.push_back(0);
         }
-        Util::SetSlice(_bits, _offset, len, code);
+        Util::set_slice(_bits, _offset, len, code);
         _buf = 0;
         _offset += len;
     }

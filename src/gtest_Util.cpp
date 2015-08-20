@@ -37,19 +37,19 @@ TEST(Util, Slice)
     for (uint64_t i = 0; i < vals.size(); ++i) {
         offset += GetBinLen(vals[i]);
     }
-    std::vector<uint64_t> bits(rsdic::Util::Floor(offset, 64));
+    std::vector<uint64_t> bits(rsdic::Util::floor(offset, 64));
 
     offset = 0;
     for (uint64_t i = 0; i < vals.size(); ++i) {
         uint64_t len = GetBinLen(vals[i]);
-        rsdic::Util::SetSlice(bits, offset, len, vals[i]);
+        rsdic::Util::set_slice(bits, offset, len, vals[i]);
         offset += len;
     }
 
     offset = 0;
     for (uint64_t i = 0; i < vals.size(); ++i) {
         uint64_t len = GetBinLen(vals[i]);
-        EXPECT_EQ(vals[i], rsdic::Util::GetSlice(bits, offset, len)) << i;
+        EXPECT_EQ(vals[i], rsdic::Util::get_slice(bits, offset, len)) << i;
         offset += len;
     }
 }

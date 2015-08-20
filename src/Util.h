@@ -28,7 +28,7 @@ namespace rsdic{
 
 class Util{
 public:
-  static uint64_t GetSlice(const std::vector<uint64_t>& bits,
+  static uint64_t get_slice(const std::vector<uint64_t>& bits,
                            uint64_t pos, uint64_t len) {
     if (len == 0) return 0;
     uint64_t block = pos / kSmallBlockSize;
@@ -41,7 +41,7 @@ public:
     return ret & ((1LLU << len) - 1);
   }
 
-  static void SetSlice(std::vector<uint64_t>& bits,
+  static void set_slice(std::vector<uint64_t>& bits,
                        uint64_t pos, uint64_t len, uint64_t val) {
     if (len == 0) return;
     uint64_t block = pos / kSmallBlockSize;
@@ -52,11 +52,11 @@ public:
     }
   }
 
-  static uint64_t Floor(uint64_t num, uint64_t div){
+  static uint64_t floor(uint64_t num, uint64_t div){
     return (num + div - 1) / div;
   }
 
-  static uint64_t GetNum(bool bit, uint64_t num, uint64_t total) {
+  static uint64_t get_num(bool bit, uint64_t num, uint64_t total) {
     if (bit) return num;
     else return total - num;
   }

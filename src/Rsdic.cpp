@@ -57,7 +57,7 @@ bool Rsdic::get_bit(uint64_t pos) const
         pointer += EnumCoder::len(_rank_small_blocks[i]);
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
-    uint64_t code = Util::GetSlice(_bits, pointer, EnumCoder::len(rank_sb));
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
@@ -73,12 +73,12 @@ uint64_t Rsdic::rank(uint64_t pos, bool bit) const
         pointer += EnumCoder::len(rank_sb);
     }
     if (pos % kSmallBlockSize == 0) {
-        return Util::GetNum(bit, rank, pos);
+        return Util::get_num(bit, rank, pos);
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
-    uint64_t code = Util::GetSlice(_bits, pointer, EnumCoder::len(rank_sb));
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-    return Util::GetNum(bit, rank, pos);
+    return Util::get_num(bit, rank, pos);
 }
 
 pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const
@@ -93,10 +93,10 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(uint64_t pos) const
         pointer += EnumCoder::len(rank_sb);
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
-    uint64_t code = Util::GetSlice(_bits, pointer, EnumCoder::len(rank_sb));
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
     uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
-    return make_pair(ret_bit, Util::GetNum(ret_bit, rank, pos));
+    return make_pair(ret_bit, Util::get_num(ret_bit, rank, pos));
 }
 
 
@@ -119,7 +119,7 @@ uint64_t Rsdic::select1(uint64_t ind) const
         pointer += EnumCoder::len(rank_sb);
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
-    uint64_t code = Util::GetSlice(_bits, pointer, EnumCoder::len(rank_sb));
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
 }
 
@@ -143,7 +143,7 @@ uint64_t Rsdic::select0(uint64_t ind) const
         pointer += EnumCoder::len(rank_sb);
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
-    uint64_t code = Util::GetSlice(_bits, pointer, EnumCoder::len(rank_sb));
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     return sblock * kSmallBlockSize + EnumCoder::select0(code, rank_sb, remain);
 }
 
