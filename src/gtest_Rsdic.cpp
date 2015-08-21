@@ -77,7 +77,7 @@ TEST(Rsdic, trivial_zero)
     for (size_t i = 0; i < bv.num(); ++i) {
         EXPECT_EQ(0, bv.get_bit(i));
         EXPECT_EQ(i, bv.rank0(i));
-        EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
+        EXPECT_EQ(i, bv.select0(i)) << " i=" << i;
     }
 }
 
@@ -127,7 +127,7 @@ TEST(Rsdic, random)
         } else {
             EXPECT_EQ(i - sum, bv.rank0(i));
             EXPECT_EQ(i - sum, bit_rank.second);
-            EXPECT_EQ(i, bv.select1(i-sum));
+            EXPECT_EQ(i, bv.select0(i-sum));
         }
 
         sum += B[i];
