@@ -36,11 +36,16 @@ public:
   void push_back(bool bit);
   std::basic_string<uint8_t> build() const;
 
-  // Deprecated
+
+  /**
+   * Deprecated
+   * This function requires friend in Rsdic. This is not needed.
+   * TODO: Remove
+   */
   void build(Rsdic& bitvec);
 
 private:
-  void write_block();
+  void _write_block();
 
   std::vector<uint64_t> _bits;
   std::vector<rsdic_uint> _pointer_blocks;

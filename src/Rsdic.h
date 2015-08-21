@@ -47,10 +47,17 @@ public:
   // Allows us to load the tree quickly
   void load(const void*, const size_t);
 
-  // Deprecated, will be removed
+  /**
+   * This save/load pair are deprecated.
+   * They are not compatible with the new load function.
+   */
   void save(std::ostream &os) const;
   void load(std::istream &is);
 
+  /**
+   * This is only needed fro RsdicBuilder::build(Rsdic&).
+   * TODO: Remove this!
+   */
   friend class RsdicBuilder;
 
 private:

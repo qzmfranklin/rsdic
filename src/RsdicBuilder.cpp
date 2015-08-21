@@ -23,8 +23,6 @@
 #include "EnumCoder.h"
 #include "RsdicBuilder.h"
 
-using namespace std;
-
 namespace rsdic
 {
 
@@ -51,7 +49,7 @@ void RsdicBuilder::clear()
 void RsdicBuilder::push_back(bool bit)
 {
     if (_bit_num % kSmallBlockSize == 0) {
-        write_block();
+        _write_block();
     }
     if (bit) {
         _buf |= (1LLU << (_bit_num % kSmallBlockSize));
@@ -68,7 +66,7 @@ void RsdicBuilder::push_back(bool bit)
     ++_bit_num;
 }
 
-void RsdicBuilder::write_block()
+void RsdicBuilder::_write_block()
 {
     if (_bit_num > 0) {
         uint64_t rank_sb = _one_num - _prev_one_num;
@@ -102,7 +100,7 @@ void RsdicBuilder::build(Rsdic& bv)
 {
     bv.clear();
     if (_bit_num == 0) return;
-    write_block();
+    _write_block();
     bv._num = _bit_num;
     bv._one_num = _one_num;
     // use copy instead of swap to allocate adequate working space
@@ -113,5 +111,11 @@ void RsdicBuilder::build(Rsdic& bv)
     bv._rank_blocks = _rank_blocks;
     bv._rank_small_blocks = _rank_small_blocks;
 }
+
+/*
+ *std::basic_string<uint8_t> RsdicBuilder::build() const
+ *{
+ *}
+ */
 
 } // rsdic
