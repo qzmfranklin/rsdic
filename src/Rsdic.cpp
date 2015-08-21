@@ -175,36 +175,76 @@ void _load(std::istream& is, std::vector<T>& vs) {
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
 }
 
-template <typename T>
-void _load(const void *buf, const size_t len) {
-}
-
 } // anonymous namespace
 
 // Deprecated
 void Rsdic::save(std::ostream& os) const
 {
+    os.write((const char*)&_num, sizeof(_num));
+    os.write((const char*)&_one_num, sizeof(_one_num));
     _save(os, _bits);
     _save(os, _pointer_blocks);
     _save(os, _rank_blocks);
     _save(os, _select_one_inds);
     _save(os, _select_zero_inds);
     _save(os, _rank_small_blocks);
-    os.write((const char*)&_num, sizeof(_num));
-    os.write((const char*)&_one_num, sizeof(_one_num));
 }
 
 // Deprecated
 void Rsdic::load(std::istream& is)
 {
+    is.read((char*)&_num, sizeof(_num));
+    is.read((char*)&_one_num, sizeof(_one_num));
     _load(is, _bits);
     _load(is, _pointer_blocks);
     _load(is, _rank_blocks);
     _load(is, _select_one_inds);
     _load(is, _select_zero_inds);
     _load(is, _rank_small_blocks);
-    is.read((char*)&_num, sizeof(_num));
-    is.read((char*)&_one_num, sizeof(_one_num));
+}
+
+// Used for fast loading
+void Rsdic::load(const void *buf, const size_t len)
+{
+    const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
+
+    memcpy(&_num, ptr, sizeof(_num));
+    ptr += sizeof(_num);
+
+    memcpy(&_one_num, ptr, sizeof(_one_num));
+    ptr += sizeof(_one_num);
+
+    size_t size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_bits.data(), ptr, size * sizeof(_bits[0]));
+    ptr += sizeof(_bits[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_pointer_blocks.data(), ptr, size * sizeof(_pointer_blocks[0]));
+    ptr += sizeof(_pointer_blocks[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_rank_blocks.data(), ptr, size * sizeof(_rank_blocks[0]));
+    ptr += sizeof(_rank_blocks[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_select_one_inds.data(), ptr, size * sizeof(_select_one_inds[0]));
+    ptr += sizeof(_select_one_inds[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_select_zero_inds.data(), ptr, size * sizeof(_select_zero_inds[0]));
+    ptr += sizeof(_select_zero_inds[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_rank_small_blocks.data(), ptr, size * sizeof(_rank_small_blocks[0]));
+    ptr += sizeof(_rank_small_blocks[0]) * size;
 }
 
 uint64_t Rsdic::get_usage_bytes() const
@@ -229,6 +269,7 @@ uint64_t Rsdic::get_usage_bytes() const
         sizeof(_one_num);
 }
 
+// TODO: Is this function ever useful?
 bool Rsdic::operator == (const Rsdic& bv) const
 {
     return

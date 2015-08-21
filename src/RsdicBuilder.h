@@ -34,7 +34,7 @@ public:
     void clear();
     void push_back(bool bit);
     void build();
-    std::basic_string<uint8_t> dump() const;
+    std::string dump() const;
 
 
     /**

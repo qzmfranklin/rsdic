@@ -24,6 +24,8 @@
 #include "RsdicBuilder.h"
 #include "BytesAligner.h"
 
+#include <iostream>
+
 namespace rsdic
 {
 
@@ -97,30 +99,26 @@ void RsdicBuilder::_write_block()
 void RsdicBuilder::build(Rsdic& bv)
 {
     assert(_state == EMPTY);
-    bv.clear();
-    if (_bit_num == 0) return;
+    if (_bit_num == 0)
+        return;
+
     _write_block();
-    bv._num = _bit_num;
-    bv._one_num = _one_num;
-    bv._bits = _bits;
-    bv._select_one_inds = _select_one_inds;
-    bv._select_zero_inds = _select_zero_inds;
-    bv._pointer_blocks = _pointer_blocks;
-    bv._rank_blocks = _rank_blocks;
-    bv._rank_small_blocks = _rank_small_blocks;
+    bv.clear();
+    bv._num                 = _bit_num;
+    bv._one_num             = _one_num;
+    bv._bits                = _bits;
+    bv._select_one_inds     = _select_one_inds;
+    bv._select_zero_inds    = _select_zero_inds;
+    bv._pointer_blocks      = _pointer_blocks;
+    bv._rank_blocks         = _rank_blocks;
+    bv._rank_small_blocks   = _rank_small_blocks;
 }
 
 void RsdicBuilder::build()
 {
     assert(_state == EMPTY);
-
+    _write_block();
     _state = READY;
 }
-
-std::basic_string<uint8_t> RsdicBuilder::dump() const
-{
-    assert(_state == READY);
-}
-
 
 } // rsdic
