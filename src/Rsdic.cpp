@@ -28,14 +28,6 @@ using namespace std;
 namespace rsdic
 {
 
-Rsdic::Rsdic() : _num(0), _one_num(0)
-{
-}
-
-Rsdic::~Rsdic()
-{
-}
-
 void Rsdic::clear()
 {
     _bits.clear();
@@ -61,7 +53,7 @@ bool Rsdic::get_bit(size_t pos) const
     return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
-uint64_t Rsdic::rank0(size_t pos) const
+uint64_t Rsdic::rank0(const size_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -81,7 +73,7 @@ uint64_t Rsdic::rank0(size_t pos) const
     return pos - rank;
 }
 
-uint64_t Rsdic::rank1(size_t pos) const
+uint64_t Rsdic::rank1(const size_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -101,7 +93,7 @@ uint64_t Rsdic::rank1(size_t pos) const
     return rank;
 }
 
-pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(size_t pos) const
+pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(const size_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -120,7 +112,7 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(size_t pos) const
 }
 
 
-uint64_t Rsdic::select1(size_t ind) const
+uint64_t Rsdic::select1(const size_t ind) const
 {
     uint64_t select_ind = ind / kSelectBlockSize;
     uint64_t lblock = _select_one_inds[select_ind];
@@ -143,7 +135,7 @@ uint64_t Rsdic::select1(size_t ind) const
     return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
 }
 
-uint64_t Rsdic::select0(size_t ind) const
+uint64_t Rsdic::select0(const size_t ind) const
 {
     uint64_t select_ind = ind / kSelectBlockSize;
     uint64_t lblock = _select_zero_inds[select_ind];
