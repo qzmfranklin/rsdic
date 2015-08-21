@@ -22,13 +22,10 @@
 #include "Util.h"
 #include "EnumCoder.h"
 #include "RsdicBuilder.h"
+#include "BytesAligner.h"
 
 namespace rsdic
 {
-
-RsdicBuilder::RsdicBuilder() : _buf(0), _offset(0), _bit_num(0), _one_num(0), _prev_one_num(0), _zero_num(0)
-{
-}
 
 void RsdicBuilder::clear()
 {
@@ -44,10 +41,13 @@ void RsdicBuilder::clear()
     _one_num = 0;
     _prev_one_num = 0;
     _zero_num = 0;
+
+    _state = EMPTY;
 }
 
 void RsdicBuilder::push_back(bool bit)
 {
+    assert(_state == EMPTY);
     if (_bit_num % kSmallBlockSize == 0) {
         _write_block();
     }
@@ -73,7 +73,6 @@ void RsdicBuilder::_write_block()
         _rank_small_blocks.push_back(rank_sb);
         _prev_one_num = _one_num;
 
-
         uint64_t len = EnumCoder::len(rank_sb);
         uint64_t code = 0;
         if (len == kSmallBlockSize) {
@@ -95,15 +94,14 @@ void RsdicBuilder::_write_block()
     }
 }
 
-
 void RsdicBuilder::build(Rsdic& bv)
 {
+    assert(_state == EMPTY);
     bv.clear();
     if (_bit_num == 0) return;
     _write_block();
     bv._num = _bit_num;
     bv._one_num = _one_num;
-    // use copy instead of swap to allocate adequate working space
     bv._bits = _bits;
     bv._select_one_inds = _select_one_inds;
     bv._select_zero_inds = _select_zero_inds;
@@ -112,10 +110,17 @@ void RsdicBuilder::build(Rsdic& bv)
     bv._rank_small_blocks = _rank_small_blocks;
 }
 
-/*
- *std::basic_string<uint8_t> RsdicBuilder::build() const
- *{
- *}
- */
+void RsdicBuilder::build()
+{
+    assert(_state == EMPTY);
+
+    _state = READY;
+}
+
+std::basic_string<uint8_t> RsdicBuilder::dump() const
+{
+    assert(_state == READY);
+}
+
 
 } // rsdic

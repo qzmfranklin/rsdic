@@ -8,7 +8,8 @@ d       :=$(ROOT)/src# this directory
 # List all the executables you want to run when you type `make test` in $(TESTS)
 # Note that you need to -include $(ROOT)/gtest/rules.mk to actually build those
 # executables
-TESTS:=gtest_Rsdic.exe gtest_RsdicBuilder.exe gtest_Util.exe gtest_EnumCoder.exe
+TESTS:=gtest_Rsdic.exe gtest_RsdicBuilder.exe gtest_Util.exe gtest_EnumCoder.exe \
+	gtest_BytesAligner.exe
 
 .PHONY: all asm clean test
 all: $(OBJ)
@@ -29,3 +30,4 @@ gtest_RsdicBuilder.exe: $(d)/gtest_RsdicBuilder.o $(d)/RsdicBuilder.o $(ROOT)/gt
 	$(d)/Rsdic.o $(d)/EnumCoder.o
 gtest_Util.exe: $(d)/gtest_Util.o $(ROOT)/gtest/gtest_main.a
 gtest_EnumCoder.exe: $(d)/gtest_EnumCoder.o $(d)/EnumCoder.o $(ROOT)/gtest/gtest_main.a
+gtest_BytesAligner.exe: $(d)/gtest_BytesAligner.o $(ROOT)/gtest/gtest_main.a
