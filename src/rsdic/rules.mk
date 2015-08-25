@@ -1,5 +1,5 @@
 #  THIS DIRECTORY
-DIRf8087e59fd95af1ae29e8fcb7ff1a3dc:=$(ROOT)/src
+DIRf8087e59fd95af1ae29e8fcb7ff1a3dc:=$(ROOT)/src/rsdic
 #  ALL C/C++ FILES IN THIS DIRECTORY (WITHOUT PATHNAME)
 $(DIRf8087e59fd95af1ae29e8fcb7ff1a3dc)C:=$(wildcard *.c)
 $(DIRf8087e59fd95af1ae29e8fcb7ff1a3dc)CPP:=$(wildcard *.cpp)

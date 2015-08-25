@@ -1,8 +1,8 @@
-ROOT    :=$(realpath ..)
-d       :=$(ROOT)/src# this directory
+ROOT    :=$(realpath ../..)
+d       :=$(ROOT)/src/rsdic# this directory
 -include $(ROOT)/root.mk
 -include $(ROOT)/gtest/rules.mk
--include $(ROOT)/src/rules.mk
+-include $(ROOT)/src/rsdic/rules.mk
 -include $(DEP)
 
 # List all the executables you want to run when you type `make test` in $(TESTS)

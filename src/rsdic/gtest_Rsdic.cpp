@@ -231,6 +231,10 @@ TEST(Rsdic, InitFromString)
 
 TEST(Rsdic, overflow)
 {
+    // This test should test overflowing select and rank.
+    // Looks like sometimes it crashes but other times it just returns a wrong
+    // number. This forces us to check the range before all rank/select
+    // operations that are possibly out of range.
     std::string str = "10 | 1110 | 110 | 10 | 110 | 0 | 10 | 0 | 10 | 110 | 0  | 0 | 10 | 0 | 0";
     rsdic::RsdicBuilder g;
     g.add_string(str);
