@@ -161,3 +161,94 @@ TEST(Rsdic, large)
     for (uint64_t i = 0; i < one_num; i++)
         EXPECT_EQ(poses[i], bv.select1(i + 1));
 }
+
+TEST(Rsdic, InitFromString)
+{
+    // Following the LOUDS convention, a super root, S in prepended to the bit vector.
+    //
+    //                                     S
+    //                                     |
+    //                                     0
+    //                                    /|\
+    //                                   / | \
+    //                                  /  |  \
+    //                                 /   |   \
+    //                                1    2    3
+    //                               / \   |  /   \
+    //                              4   5  6 7     8
+    //                                  |    |    / \
+    //                                  9    10  11  12
+    //                                           |
+    //                                           13
+    //
+    //  node index  |   S |    0 |   1 |  2 |   3 | 4 |  5 | 6 |  7 |   8 | 9  |10 | 11 |12 |13
+    // -------------+-----+------+-----+----+-----+---+----+---+----+-----+----+---+----+---+---
+    std::string str = "10 | 1110 | 110 | 10 | 110 | 0 | 10 | 0 | 10 | 110 | 0  | 0 | 10 | 0 | 0";
+    // -------------+-----+------+-----+----+-----+---+----+---+----+-----+----+---+----+---+---
+    //     bit      |  01 | 2345 | 678 | 90 | 123 | 4 | 56 | 7 | 89 | 012 | 3  | 4 | 56 | 7 | 8
+    //   offset     |         0          |           10           |           20
+    //
+    // Given the bit offset m in the bit vector v:
+    //      v[m] = 1:
+    //          child(m)  = select0(rank1(m)) + 1
+    //          parent(m) = select1(rank0(m))
+    //      v[m] = 0:
+    //          no child node
+    //          parent(m) = select1(rank0(m) - 1)
+    rsdic::RsdicBuilder g;
+    g.add_string(str);
+    rsdic::Rsdic v;
+    g.build(v);
+
+    // shorthand: #8 = node 8
+    // #8, m = 20, 21, 22
+    {   // first_child = #11
+        //     rank1(20)         = 12
+        //     select0(12) + 1   = 25 -> #11 (first bit)
+        const uint64_t m = 20;
+        const uint64_t rank1 = v.rank1(m);
+        const uint64_t select0 = v.select0(rank1);
+        EXPECT_EQ(12, rank1);
+        EXPECT_EQ(25, select0 + 1);
+    }
+    {   // second_child = #12
+        //     rank1(21)         = 13
+        //     select0(13) + 1   = 27 -> #12 (first bit)
+        const uint64_t m = 21;
+        const uint64_t rank1 = v.rank1(m);
+        const uint64_t select0 = v.select0(rank1);
+        EXPECT_EQ(13, rank1);
+        EXPECT_EQ(27, select0 + 1);
+    }
+    {   // parent = #3
+        //     rank0(20, 21)     = 9
+        //     select1(9)        = 12 -> #3 (second child)
+        const uint64_t m = 21;
+        const uint64_t rank0 = v.rank0(m);
+        const uint64_t select1 = v.select1(rank0);
+        EXPECT_EQ(9, rank0);
+        EXPECT_EQ(12, select1);
+    }
+    {   // parent = #3
+        //     rank0(22) - 1     = 9
+        //     select1(9)        = 12 -> #3 (second child)
+        const uint64_t m = 22;
+        const uint64_t rank0 = v.rank0(m);
+        const uint64_t select1 = v.select1(rank0 - 1);
+        EXPECT_EQ(9, rank0 - 1);
+        EXPECT_EQ(12, select1);
+    }
+}
+
+TEST(Rsdic, overflow)
+{
+    std::string str = "10 | 1110 | 110 | 10 | 110 | 0 | 10 | 0 | 10 | 110 | 0  | 0 | 10 | 0 | 0";
+    rsdic::RsdicBuilder g;
+    g.add_string(str);
+    rsdic::Rsdic v;
+    g.build(v);
+
+    EXPECT_EQ(v.one_num(), v.rank1(v.size() - 1));
+    EXPECT_EQ(v.zero_num(), v.rank0(v.size() - 1));
+    v.print();
+}

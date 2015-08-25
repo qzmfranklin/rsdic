@@ -74,14 +74,3 @@ TEST(RsdicBuilder, EnumCode)
     uint64_t decoded_bits = rsdic::EnumCoder::decode(code, one_num);
     EXPECT_EQ(val, decoded_bits);
 }
-
-TEST(RsdicBuilder, InitFromString)
-{
-    // Following the LOUDS convention, a super root, S in prepended to the bit vector.
-    //              S      0     1    2     3   4    5   6    7     8   9   10   11  12  13
-    std::string str = "10 | 1110 | 110 | 10 | 110 | 0 | 10 | 0 | 10 | 110 | 0  | 0 | 10 | 0 | 0";
-    rsdic::RsdicBuilder g;
-    g.add_string(str);
-    rsdic::Rsdic v;
-    g.build(v);
-}

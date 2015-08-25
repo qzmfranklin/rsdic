@@ -48,6 +48,8 @@ public:
   void get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const;
   bool operator == (const Rsdic& bv) const;
 
+  virtual void print() const override;
+
   // Allows us to load the tree quickly
   void load(const void*, const uint64_t);
 

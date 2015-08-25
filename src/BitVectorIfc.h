@@ -17,6 +17,8 @@ public:
     virtual uint64_t select1(const uint64_t) const = 0;
 
     virtual uint64_t size() const = 0;
+
+    virtual void print() const = 0;
     //virtual bool operator[](const uint64_t off) const { return get_bit(off); };
     //virtual std::string to_string() const = 0;
 };

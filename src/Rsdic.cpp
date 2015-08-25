@@ -298,5 +298,12 @@ bool Rsdic::operator == (const Rsdic& bv) const
         _one_num == bv._one_num;
 }
 
+void Rsdic::print() const
+{
+    fprintf(stdout,"    size      = %llu\n", _num);
+    fprintf(stdout,"    one_num   = %llu\n", _one_num);
+    fprintf(stdout,"    zero_num  = %llu\n", this->zero_num());
+    fprintf(stdout,"    one_ratio = %lf\n", static_cast<double>(_one_num) / _num);
+}
 
 }
