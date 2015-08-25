@@ -163,4 +163,3 @@ TEST(Rsdic, large)
         EXPECT_EQ(poses[i], bv.select1(i));
     }
 }
-
