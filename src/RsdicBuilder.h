@@ -32,16 +32,7 @@ class RsdicBuilder{
 
 public:
     void clear();
-    void push_back(bool bit);
-    void build();
-    std::string dump() const;
-
-
-    /**
-     * Deprecated
-     * This function requires friend in Rsdic. This is not needed.
-     * TODO: Remove
-     */
+    void push_back(const bool bit);
     void build(Rsdic& bitvec);
 
 private:

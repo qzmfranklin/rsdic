@@ -47,7 +47,7 @@ void RsdicBuilder::clear()
     _state = EMPTY;
 }
 
-void RsdicBuilder::push_back(bool bit)
+void RsdicBuilder::push_back(const bool bit)
 {
     assert(_state == EMPTY);
     if (_bit_num % kSmallBlockSize == 0) {
@@ -114,13 +114,6 @@ void RsdicBuilder::build(Rsdic& bv)
     bv._pointer_blocks      = _pointer_blocks;
     bv._rank_blocks         = _rank_blocks;
     bv._rank_small_blocks   = _rank_small_blocks;
-}
-
-void RsdicBuilder::build()
-{
-    assert(_state == EMPTY);
-    _write_block();
-    _state = READY;
 }
 
 } // rsdic
