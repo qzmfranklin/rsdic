@@ -30,8 +30,7 @@
 TEST(RsdicBuilder, trivial)
 {
     rsdic::RsdicBuilder bvb;
-    rsdic::Rsdic bv;
-    bvb.build(bv);
+    const rsdic::Rsdic bv = bvb.build();
 
     EXPECT_EQ(0, bv.num());
     EXPECT_EQ(0, bv.one_num());
@@ -40,12 +39,11 @@ TEST(RsdicBuilder, trivial)
 TEST(RsdicBuilder, small)
 {
     rsdic::RsdicBuilder bvb;
-    rsdic::Rsdic bv;
 
     bvb.push_back(0);
     bvb.push_back(1);
     bvb.push_back(0);
-    bvb.build(bv);
+    const rsdic::Rsdic bv = bvb.build();
 
     EXPECT_EQ(3, bv.num());
     EXPECT_EQ(1, bv.one_num());

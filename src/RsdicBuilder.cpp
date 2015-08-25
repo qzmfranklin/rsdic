@@ -112,24 +112,24 @@ void RsdicBuilder::_write_block()
     }
 }
 
-void RsdicBuilder::build(Rsdic& bv)
+Rsdic RsdicBuilder::build()
 {
     assert(_state == EMPTY);
     if (_bit_num == 0)
-        return;
+        return Rsdic();
 
     _write_block();
     assert(_state == READY);
-
-    bv.clear();
-    bv._num                 = _bit_num;
-    bv._one_num             = _one_num;
-    bv._bits                = _bits;
-    bv._select_one_inds     = _select_one_inds;
-    bv._select_zero_inds    = _select_zero_inds;
-    bv._pointer_blocks      = _pointer_blocks;
-    bv._rank_blocks         = _rank_blocks;
-    bv._rank_small_blocks   = _rank_small_blocks;
+    Rsdic out;
+    out._num                 = _bit_num;
+    out._one_num             = _one_num;
+    out._bits                = _bits;
+    out._select_one_inds     = _select_one_inds;
+    out._select_zero_inds    = _select_zero_inds;
+    out._pointer_blocks      = _pointer_blocks;
+    out._rank_blocks         = _rank_blocks;
+    out._rank_small_blocks   = _rank_small_blocks;
+    return out;
 }
 
 } // rsdic

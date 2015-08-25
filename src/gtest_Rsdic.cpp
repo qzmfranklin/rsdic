@@ -24,142 +24,132 @@
 #include "Rsdic.h"
 #include "EnumCoder.h"
 
-
-using namespace rsdic;
-
 TEST(BitVec, combination)
 {
     for (uint64_t i = 0; i <= 64; ++i) {
-        EXPECT_EQ(1, EnumCoder::kCombinationTable64_[i][i]);
+        EXPECT_EQ(1, rsdic::EnumCoder::kCombinationTable64_[i][i]);
     }
     for (uint64_t i = 1; i <= 64; ++i) {
         for (uint64_t j = 1; j <= i; ++j) {
-            EXPECT_EQ(EnumCoder::kCombinationTable64_[i][j],
-                      EnumCoder::kCombinationTable64_[i-1][j-1] +
-                      EnumCoder::kCombinationTable64_[i-1][j]);
+            EXPECT_EQ(rsdic::EnumCoder::kCombinationTable64_[i][j],
+                      rsdic::EnumCoder::kCombinationTable64_[i-1][j-1] +
+                      rsdic::EnumCoder::kCombinationTable64_[i-1][j]);
         }
     }
 }
 
-
 TEST(Rsdic, small)
 {
-    RsdicBuilder bvb;
+    rsdic::RsdicBuilder g;
     const uint64_t n = 64;
     for (int i = 0; i < n; i++)
-        bvb.push_back(1);
+        g.push_back(1);
 
-    Rsdic bv;
-    bvb.build(bv);
-    EXPECT_EQ(n, bv.size());
-    EXPECT_EQ(n, bv.one_num());
-    for (size_t i = 0; i < bv.size(); i++) {
-        EXPECT_EQ(1, bv.get_bit(i));
-        EXPECT_EQ(i + 1, bv.rank1(i));
-        EXPECT_EQ(i, bv.select1(i + 1));
+    const rsdic::Rsdic v = g.build();
+    EXPECT_EQ(n, v.size());
+    EXPECT_EQ(n, v.one_num());
+    for (size_t i = 0; i < v.size(); i++) {
+        EXPECT_EQ(1, v.get_bit(i));
+        EXPECT_EQ(i + 1, v.rank1(i));
+        EXPECT_EQ(i, v.select1(i + 1));
     }
 }
 
-
 TEST(Rsdic, trivial_zero)
 {
-    RsdicBuilder bvb;
+    rsdic::RsdicBuilder g;
     const uint64_t n = 10000;
     for (int i = 0; i < n; i++)
-        bvb.push_back(0);
+        g.push_back(0);
 
-    Rsdic bv;
-    bvb.build(bv);
-    EXPECT_EQ(n, bv.size());
-    EXPECT_EQ(0, bv.one_num());
-    for (size_t i = 0; i < bv.size(); i++) {
-        EXPECT_EQ(0, bv.get_bit(i));
-        EXPECT_EQ(i + 1, bv.rank0(i));
-        EXPECT_EQ(i, bv.select0(i + 1));
+    const rsdic::Rsdic v = g.build();
+    EXPECT_EQ(n, v.size());
+    EXPECT_EQ(0, v.one_num());
+    for (size_t i = 0; i < v.size(); i++) {
+        EXPECT_EQ(0, v.get_bit(i));
+        EXPECT_EQ(i + 1, v.rank0(i));
+        EXPECT_EQ(i, v.select0(i + 1));
     }
 }
 
 TEST(Rsdic, trivial_one)
 {
-    RsdicBuilder bvb;
+    rsdic::RsdicBuilder g;
     const uint64_t n = 10000;
     for (int i = 0; i < n; i++)
-        bvb.push_back(1);
+        g.push_back(1);
 
-    Rsdic bv;
-    bvb.build(bv);
-    EXPECT_EQ(n, bv.size());
-    EXPECT_EQ(n, bv.one_num());
-    for (size_t i = 0; i < bv.size(); i++) {
-        EXPECT_EQ(1, bv.get_bit(i));
-        EXPECT_EQ(i + 1, bv.rank1(i));
-        EXPECT_EQ(i, bv.select1(i + 1));
+    const rsdic::Rsdic v = g.build();
+    EXPECT_EQ(n, v.size());
+    EXPECT_EQ(n, v.one_num());
+    for (size_t i = 0; i < v.size(); i++) {
+        EXPECT_EQ(1, v.get_bit(i));
+        EXPECT_EQ(i + 1, v.rank1(i));
+        EXPECT_EQ(i, v.select1(i + 1));
     }
 }
 
 
 TEST(Rsdic, get_bit_and_rank1)
 {
-    RsdicBuilder bvb;
+    rsdic::RsdicBuilder g;
     std::vector<int> B;
     const uint64_t n = 100000;
     for (int i = 0; i < n; ++i) {
         int b = rand() % 2;
-        bvb.push_back(b);
+        g.push_back(b);
         B.push_back(b);
     }
 
-    Rsdic bv;
-    bvb.build(bv);
-    EXPECT_EQ(n, bv.size());
+    const rsdic::Rsdic v = g.build();
+    EXPECT_EQ(n, v.size());
     int sum = 0;
-    for (size_t i = 0; i < bv.size(); ++i) {
-        EXPECT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
+    for (size_t i = 0; i < v.size(); ++i) {
+        EXPECT_EQ(B[i]  , v.get_bit(i)) << " i=" << i;
         bool bit;
         uint64_t rank;
-        bv.get_bit_and_rank1(i, &bit, &rank);
+        v.get_bit_and_rank1(i, &bit, &rank);
         EXPECT_EQ(B[i], bit);
         if (B[i]) {
-            EXPECT_EQ(sum + 1, bv.rank1(i));
+            EXPECT_EQ(sum + 1, v.rank1(i));
             EXPECT_EQ(sum + 1, rank);
-            EXPECT_EQ(i, bv.select1(sum + 1));
+            EXPECT_EQ(i, v.select1(sum + 1));
         } else {
-            EXPECT_EQ(i - sum + 1, bv.rank0(i));
+            EXPECT_EQ(i - sum + 1, v.rank0(i));
             EXPECT_EQ(i - sum, rank);
-            EXPECT_EQ(i, bv.select0(i - sum + 1));
+            EXPECT_EQ(i, v.select0(i - sum + 1));
         }
 
         sum += B[i];
     }
 
     std::ostringstream os;
-    bv.save(os);
+    v.save(os);
     std::istringstream is(os.str());
 
-    Rsdic bv_load;
-    bv_load.load(is);
+    rsdic::Rsdic v_load;
+    v_load.load(is);
 
-    EXPECT_EQ(bv, bv_load);
+    EXPECT_EQ(v, v_load);
 }
 
 TEST(Rsdic, large)
 {
-    RsdicBuilder rsdb;
+    rsdic::RsdicBuilder g;
     const uint64_t n = 16llu * 1024llu * 1024llu; // 4MB
     std::vector<uint64_t> poses;
     for (uint64_t i = 0; i < n; i++) {
         float r = (float)rand() / RAND_MAX;
         if (r < 0.5) {
-            rsdb.push_back(1);
+            g.push_back(1);
             poses.push_back(i);
-        } else rsdb.push_back(0);
+        } else g.push_back(0);
     }
 
-    Rsdic bv;
-    rsdb.build(bv);
-    uint64_t one_num = bv.one_num();
+    const rsdic::Rsdic v = g.build();
+    uint64_t one_num = v.one_num();
     for (uint64_t i = 0; i < one_num; i++)
-        EXPECT_EQ(poses[i], bv.select1(i + 1));
+        EXPECT_EQ(poses[i], v.select1(i + 1));
 }
 
 TEST(Rsdic, InitFromString)
@@ -197,8 +187,7 @@ TEST(Rsdic, InitFromString)
     //          parent(m) = select1(rank0(m) - 1)
     rsdic::RsdicBuilder g;
     g.add_string(str);
-    rsdic::Rsdic v;
-    g.build(v);
+    const rsdic::Rsdic v = g.build();
 
     // shorthand: #9 = node 9
     // #9, m = 20, 21, 22
@@ -245,14 +234,9 @@ TEST(Rsdic, overflow)
     std::string str = "10 | 1110 | 110 | 10 | 110 | 0 | 10 | 0 | 10 | 110 | 0  | 0 | 10 | 0 | 0";
     rsdic::RsdicBuilder g;
     g.add_string(str);
-    rsdic::Rsdic v;
-    g.build(v);
+    const rsdic::Rsdic v = g.build();
 
     EXPECT_EQ(v.one_num(), v.rank1(v.size() - 1));
     EXPECT_EQ(v.zero_num(), v.rank0(v.size() - 1));
     v.print();
-}
-
-TEST(Rsdic, query_speed)
-{
 }

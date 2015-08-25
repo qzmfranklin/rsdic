@@ -34,7 +34,7 @@ public:
     void clear();
     void push_back(const bool bit);
     void add_string(const std::string &str);
-    void build(Rsdic& bitvec);
+    Rsdic build();
 
 private:
     enum {
