@@ -20,6 +20,7 @@
 #ifndef RSDIC_RSDIC_HPP_
 #define RSDIC_RSDIC_HPP_
 
+#include "BitVectorIfc.h"
 #include "Type.h"
 
 #include <vector>
@@ -28,29 +29,41 @@
 
 namespace rsdic{
 
-class Rsdic{
+class Rsdic: BitVectorIfc {
 public:
   void clear();
-  bool get_bit(const size_t pos) const;
+  virtual bool get_bit(const uint64_t pos) const override;
 
-  // number of 0/1's in [0, pos - 1]
-  uint64_t rank0(const size_t pos) const;
-  uint64_t rank1(const size_t pos) const;
+  // number of 0/1's in [0, pos]
+  virtual uint64_t rank0(const uint64_t pos) const override;
+  virtual uint64_t rank1(const uint64_t pos) const override;
 
-  // position of (ind + 1)-th 0/1
-  uint64_t select0(const size_t ind) const;
-  uint64_t select1(const size_t ind) const;
+  // position of ind-th 0/1
+  virtual uint64_t select0(const uint64_t ind) const override;
+  virtual uint64_t select1(const uint64_t ind) const override;
 
-  std::pair<uint64_t, uint64_t> get_bit_and_rank(size_t pos) const;
+  virtual uint64_t size() const override { return this->_num; }
+
+  void get_bit_and_rank0(const uint64_t pos, bool *bit, uint64_t *rank0) const;
+  void get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const;
   bool operator == (const Rsdic& bv) const;
 
-  // Allows us to load the tree quickly
-  void load(const void*, const size_t);
+  virtual void print() const override;
 
-  // Deprecated, will be removed
+  // Allows us to load the tree quickly
+  void load(const void*, const uint64_t);
+
+  /**
+   * This save/load pair are deprecated.
+   * They are not compatible with the new load function.
+   */
   void save(std::ostream &os) const;
   void load(std::istream &is);
 
+  /**
+   * This is only needed fro RsdicBuilder::build(Rsdic&).
+   * TODO: Remove this!
+   */
   friend class RsdicBuilder;
 
 private:

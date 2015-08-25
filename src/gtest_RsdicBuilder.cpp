@@ -74,5 +74,3 @@ TEST(RsdicBuilder, EnumCode)
     uint64_t decoded_bits = rsdic::EnumCoder::decode(code, one_num);
     EXPECT_EQ(val, decoded_bits);
 }
-
-

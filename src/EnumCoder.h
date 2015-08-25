@@ -31,7 +31,6 @@ public:
   static uint64_t decode(uint64_t code, uint64_t rank_sb);
   static bool get_bit(uint64_t code, uint64_t rank_sb, uint64_t pos);
   static uint64_t rank(uint64_t code, uint64_t rank_sb, uint64_t pos);
-  static uint64_t select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit);
 
   static uint64_t len(uint64_t rank_sb){
     return kEnumCodeLength_[rank_sb];

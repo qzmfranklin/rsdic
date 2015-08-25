@@ -22,15 +22,12 @@
 #include "Util.h"
 #include "EnumCoder.h"
 #include "RsdicBuilder.h"
+#include "BytesAligner.h"
 
-using namespace std;
+#include <iostream>
 
 namespace rsdic
 {
-
-RsdicBuilder::RsdicBuilder() : _buf(0), _offset(0), _bit_num(0), _one_num(0), _prev_one_num(0), _zero_num(0)
-{
-}
 
 void RsdicBuilder::clear()
 {
@@ -46,12 +43,15 @@ void RsdicBuilder::clear()
     _one_num = 0;
     _prev_one_num = 0;
     _zero_num = 0;
+
+    _state = EMPTY;
 }
 
-void RsdicBuilder::push_back(bool bit)
+void RsdicBuilder::push_back(const bool bit)
 {
+    assert(_state == EMPTY);
     if (_bit_num % kSmallBlockSize == 0) {
-        write_block();
+        _write_block();
     }
     if (bit) {
         _buf |= (1LLU << (_bit_num % kSmallBlockSize));
@@ -68,13 +68,28 @@ void RsdicBuilder::push_back(bool bit)
     ++_bit_num;
 }
 
-void RsdicBuilder::write_block()
+void RsdicBuilder::add_string(const std::string &str)
+{
+    for (const auto &ch: str) {
+        switch (ch) {
+        case '0':
+            this->push_back(0);
+            break;
+        case '1':
+            this->push_back(1);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void RsdicBuilder::_write_block()
 {
     if (_bit_num > 0) {
         uint64_t rank_sb = _one_num - _prev_one_num;
         _rank_small_blocks.push_back(rank_sb);
         _prev_one_num = _one_num;
-
 
         uint64_t len = EnumCoder::len(rank_sb);
         uint64_t code = 0;
@@ -97,21 +112,24 @@ void RsdicBuilder::write_block()
     }
 }
 
-
 void RsdicBuilder::build(Rsdic& bv)
 {
+    assert(_state == EMPTY);
+    if (_bit_num == 0)
+        return;
+
+    _write_block();
+    assert(_state == READY);
+
     bv.clear();
-    if (_bit_num == 0) return;
-    write_block();
-    bv._num = _bit_num;
-    bv._one_num = _one_num;
-    // use copy instead of swap to allocate adequate working space
-    bv._bits = _bits;
-    bv._select_one_inds = _select_one_inds;
-    bv._select_zero_inds = _select_zero_inds;
-    bv._pointer_blocks = _pointer_blocks;
-    bv._rank_blocks = _rank_blocks;
-    bv._rank_small_blocks = _rank_small_blocks;
+    bv._num                 = _bit_num;
+    bv._one_num             = _one_num;
+    bv._bits                = _bits;
+    bv._select_one_inds     = _select_one_inds;
+    bv._select_zero_inds    = _select_zero_inds;
+    bv._pointer_blocks      = _pointer_blocks;
+    bv._rank_blocks         = _rank_blocks;
+    bv._rank_small_blocks   = _rank_small_blocks;
 }
 
 } // rsdic

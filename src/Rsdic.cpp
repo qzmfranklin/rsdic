@@ -40,7 +40,7 @@ void Rsdic::clear()
     _one_num = 0;
 }
 
-bool Rsdic::get_bit(size_t pos) const
+bool Rsdic::get_bit(uint64_t pos) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -53,47 +53,55 @@ bool Rsdic::get_bit(size_t pos) const
     return EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 }
 
-uint64_t Rsdic::rank0(const size_t pos) const
+uint64_t Rsdic::rank0(const uint64_t pos) const
 {
-    uint64_t lblock = pos / kLargeBlockSize;
+    const uint64_t pos2 = pos + 1;
+    uint64_t lblock = pos2 / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t sblock = pos2 / kSmallBlockSize;
     uint64_t rank = _rank_blocks[lblock];
     for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
         uint64_t rank_sb = _rank_small_blocks[i];
         rank += rank_sb;
         pointer += EnumCoder::len(rank_sb);
     }
-    if (pos % kSmallBlockSize == 0) {
-        return pos - rank;
+    if (pos2 % kSmallBlockSize == 0) {
+        return pos2 - rank;
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
-    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-    return pos - rank;
+    rank += EnumCoder::rank(code, rank_sb, pos2 % kSmallBlockSize);
+    return pos2 - rank;
 }
 
-uint64_t Rsdic::rank1(const size_t pos) const
+uint64_t Rsdic::rank1(const uint64_t pos) const
 {
-    uint64_t lblock = pos / kLargeBlockSize;
+    const uint64_t pos2 = pos + 1;
+    uint64_t lblock = pos2 / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t sblock = pos2 / kSmallBlockSize;
     uint64_t rank = _rank_blocks[lblock];
     for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
         uint64_t rank_sb = _rank_small_blocks[i];
         rank += rank_sb;
         pointer += EnumCoder::len(rank_sb);
     }
-    if (pos % kSmallBlockSize == 0) {
+    if (pos2 % kSmallBlockSize == 0) {
         return rank;
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
-    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
+    rank += EnumCoder::rank(code, rank_sb, pos2 % kSmallBlockSize);
     return rank;
 }
 
-pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(const size_t pos) const
+void Rsdic::get_bit_and_rank0(const uint64_t pos, bool *bit, uint64_t *rank0) const
+{
+    this->get_bit_and_rank1(pos, bit, rank0);
+    *rank0 = pos + 1 - *rank0;
+}
+
+void Rsdic::get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -108,21 +116,26 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(const size_t pos) const
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
     uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
-    return make_pair(ret_bit, ret_bit ? rank : pos - rank);
+
+    *bit   = ret_bit;
+    *rank1 = ret_bit ? rank + 1 : pos - rank;
+
+    //return make_pair(ret_bit, ret_bit ? rank : pos - rank);
 }
 
 
-uint64_t Rsdic::select1(const size_t ind) const
+uint64_t Rsdic::select1(const uint64_t ind) const
 {
-    uint64_t select_ind = ind / kSelectBlockSize;
+    const uint64_t ind2 = ind - 1;
+    uint64_t select_ind = ind2 / kSelectBlockSize;
     uint64_t lblock = _select_one_inds[select_ind];
     for (; lblock < _rank_blocks.size(); ++lblock) {
-        if (ind < _rank_blocks[lblock]) break;
+        if (ind2 < _rank_blocks[lblock]) break;
     }
     --lblock;
     uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t remain = ind - _rank_blocks[lblock] + 1;
+    uint64_t remain = ind2 - _rank_blocks[lblock] + 1;
 
     for (; sblock < _rank_small_blocks.size(); ++sblock) {
         const uint64_t rank_sb = _rank_small_blocks[sblock];
@@ -135,18 +148,19 @@ uint64_t Rsdic::select1(const size_t ind) const
     return sblock * kSmallBlockSize + EnumCoder::select1(code, rank_sb, remain);
 }
 
-uint64_t Rsdic::select0(const size_t ind) const
+uint64_t Rsdic::select0(const uint64_t ind) const
 {
-    uint64_t select_ind = ind / kSelectBlockSize;
+    const uint64_t ind2 = ind - 1;
+    uint64_t select_ind = ind2 / kSelectBlockSize;
     uint64_t lblock = _select_zero_inds[select_ind];
     for (; lblock < _rank_blocks.size(); ++lblock) {
-        if (lblock * kLargeBlockSize - _rank_blocks[lblock] > ind) break;
+        if (lblock * kLargeBlockSize - _rank_blocks[lblock] > ind2) break;
     }
     --lblock;
 
     uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t remain = ind - lblock * kLargeBlockSize + _rank_blocks[lblock] + 1;
+    uint64_t remain = ind2 - lblock * kLargeBlockSize + _rank_blocks[lblock] + 1;
 
     for (; sblock < _rank_small_blocks.size(); ++sblock) {
         const uint64_t rank_sb = kSmallBlockSize - _rank_small_blocks[sblock];
@@ -162,21 +176,17 @@ uint64_t Rsdic::select0(const size_t ind) const
 namespace {
 template <typename T>
 void _save(std::ostream& os, const std::vector<T>& vs) {
-  size_t size = vs.size();
+  uint64_t size = vs.size();
   os.write((const char*)&size, sizeof(size));
   os.write((const char*)&vs[0], sizeof(vs[0]) * size);
 }
 
 template <typename T>
 void _load(std::istream& is, std::vector<T>& vs) {
-  size_t size = 0;
+  uint64_t size = 0;
   is.read((char*)&size, sizeof(size));
   vs.resize(size);
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
-}
-
-template <typename T>
-void _load(const void *buf, const size_t len) {
 }
 
 } // anonymous namespace
@@ -184,27 +194,72 @@ void _load(const void *buf, const size_t len) {
 // Deprecated
 void Rsdic::save(std::ostream& os) const
 {
+    os.write((const char*)&_num, sizeof(_num));
+    os.write((const char*)&_one_num, sizeof(_one_num));
     _save(os, _bits);
     _save(os, _pointer_blocks);
     _save(os, _rank_blocks);
     _save(os, _select_one_inds);
     _save(os, _select_zero_inds);
     _save(os, _rank_small_blocks);
-    os.write((const char*)&_num, sizeof(_num));
-    os.write((const char*)&_one_num, sizeof(_one_num));
 }
 
 // Deprecated
 void Rsdic::load(std::istream& is)
 {
+    is.read((char*)&_num, sizeof(_num));
+    is.read((char*)&_one_num, sizeof(_one_num));
     _load(is, _bits);
     _load(is, _pointer_blocks);
     _load(is, _rank_blocks);
     _load(is, _select_one_inds);
     _load(is, _select_zero_inds);
     _load(is, _rank_small_blocks);
-    is.read((char*)&_num, sizeof(_num));
-    is.read((char*)&_one_num, sizeof(_one_num));
+}
+
+// Used for fast loading
+// TODO: Make it cleaner
+void Rsdic::load(const void *buf, const uint64_t len)
+{
+    const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
+
+    memcpy(&_num, ptr, sizeof(_num));
+    ptr += sizeof(_num);
+
+    memcpy(&_one_num, ptr, sizeof(_one_num));
+    ptr += sizeof(_one_num);
+
+    uint64_t size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_bits.data(), ptr, size * sizeof(_bits[0]));
+    ptr += sizeof(_bits[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_pointer_blocks.data(), ptr, size * sizeof(_pointer_blocks[0]));
+    ptr += sizeof(_pointer_blocks[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_rank_blocks.data(), ptr, size * sizeof(_rank_blocks[0]));
+    ptr += sizeof(_rank_blocks[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_select_one_inds.data(), ptr, size * sizeof(_select_one_inds[0]));
+    ptr += sizeof(_select_one_inds[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_select_zero_inds.data(), ptr, size * sizeof(_select_zero_inds[0]));
+    ptr += sizeof(_select_zero_inds[0]) * size;
+
+    memcpy(&size, ptr, sizeof(size));
+    ptr += sizeof(size);
+    memcpy(_rank_small_blocks.data(), ptr, size * sizeof(_rank_small_blocks[0]));
+    ptr += sizeof(_rank_small_blocks[0]) * size;
 }
 
 uint64_t Rsdic::get_usage_bytes() const
@@ -229,6 +284,7 @@ uint64_t Rsdic::get_usage_bytes() const
         sizeof(_one_num);
 }
 
+// TODO: Is this function ever useful?
 bool Rsdic::operator == (const Rsdic& bv) const
 {
     return
@@ -242,5 +298,12 @@ bool Rsdic::operator == (const Rsdic& bv) const
         _one_num == bv._one_num;
 }
 
+void Rsdic::print() const
+{
+    fprintf(stdout,"    size      = %llu\n", _num);
+    fprintf(stdout,"    one_num   = %llu\n", _one_num);
+    fprintf(stdout,"    zero_num  = %llu\n", this->zero_num());
+    fprintf(stdout,"    one_ratio = %lf\n", static_cast<double>(_one_num) / _num);
+}
 
 }

@@ -31,29 +31,31 @@ class Rsdic;
 class RsdicBuilder{
 
 public:
-  RsdicBuilder();
-  void clear();
-  void push_back(bool bit);
-  std::basic_string<uint8_t> build() const;
-
-  // Deprecated
-  void build(Rsdic& bitvec);
+    void clear();
+    void push_back(const bool bit);
+    void add_string(const std::string &str);
+    void build(Rsdic& bitvec);
 
 private:
-  void write_block();
+    enum {
+        EMPTY,
+        READY
+    } _state = EMPTY;
 
-  std::vector<uint64_t> _bits;
-  std::vector<rsdic_uint> _pointer_blocks;
-  std::vector<rsdic_uint> _select_one_inds;
-  std::vector<rsdic_uint> _select_zero_inds;
-  std::vector<rsdic_uint> _rank_blocks;
-  std::vector<uint8_t> _rank_small_blocks;
-  uint64_t _buf;
-  rsdic_uint _offset;
-  rsdic_uint _bit_num;
-  rsdic_uint _one_num;
-  rsdic_uint _prev_one_num;
-  rsdic_uint _zero_num;
+    void _write_block();
+
+    std::vector<uint64_t> _bits;
+    std::vector<rsdic_uint> _pointer_blocks;
+    std::vector<rsdic_uint> _select_one_inds;
+    std::vector<rsdic_uint> _select_zero_inds;
+    std::vector<rsdic_uint> _rank_blocks;
+    std::vector<uint8_t> _rank_small_blocks;
+    uint64_t _buf = 0;
+    rsdic_uint _offset = 0;
+    rsdic_uint _bit_num = 0;
+    rsdic_uint _one_num = 0;
+    rsdic_uint _prev_one_num = 0;
+    rsdic_uint _zero_num = 0;
 };
 
 }
