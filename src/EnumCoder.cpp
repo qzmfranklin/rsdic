@@ -119,7 +119,8 @@ uint64_t EnumCoder::select_raw(uint64_t code, uint64_t num)
             if (num == 0) return offset;
         }
     }
-    assert(false);
+
+    abort();
 }
 
 uint64_t EnumCoder::select0(uint64_t code, uint64_t rank_sb, uint64_t num)
@@ -137,7 +138,8 @@ uint64_t EnumCoder::select0(uint64_t code, uint64_t rank_sb, uint64_t num)
             if (num == 0) return offset;
         }
     }
-    assert(false);
+
+    abort();
 }
 
 uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num)
@@ -156,7 +158,8 @@ uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num)
             --rank_sb;
         }
     }
-    assert(false);
+
+    abort();
 }
 
 uint64_t EnumCoder::select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit)
