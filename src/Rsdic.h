@@ -44,7 +44,6 @@ public:
 
   virtual uint64_t size() const override { return this->_num; }
 
-
   std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
   bool operator == (const Rsdic& bv) const;
 

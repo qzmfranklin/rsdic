@@ -52,9 +52,9 @@ TEST(Rsdic, small)
 
     Rsdic bv;
     bvb.build(bv);
-    EXPECT_EQ(n, bv.num());
+    EXPECT_EQ(n, bv.size());
     EXPECT_EQ(n, bv.one_num());
-    for (size_t i = 0; i < bv.num(); ++i) {
+    for (size_t i = 0; i < bv.size(); ++i) {
         EXPECT_EQ(1, bv.get_bit(i));
         EXPECT_EQ(i, bv.rank1(i));
         EXPECT_EQ(i, bv.select1(i));
@@ -72,9 +72,9 @@ TEST(Rsdic, trivial_zero)
 
     Rsdic bv;
     bvb.build(bv);
-    EXPECT_EQ(n, bv.num());
+    EXPECT_EQ(n, bv.size());
     EXPECT_EQ(0, bv.one_num());
-    for (size_t i = 0; i < bv.num(); ++i) {
+    for (size_t i = 0; i < bv.size(); ++i) {
         EXPECT_EQ(0, bv.get_bit(i));
         EXPECT_EQ(i, bv.rank0(i));
         EXPECT_EQ(i, bv.select0(i)) << " i=" << i;
@@ -91,9 +91,9 @@ TEST(Rsdic, trivial_one)
 
     Rsdic bv;
     bvb.build(bv);
-    EXPECT_EQ(n, bv.num());
+    EXPECT_EQ(n, bv.size());
     EXPECT_EQ(n, bv.one_num());
-    for (size_t i = 0; i < bv.num(); ++i) {
+    for (size_t i = 0; i < bv.size(); ++i) {
         EXPECT_EQ(1, bv.get_bit(i));
         EXPECT_EQ(i, bv.rank1(i)) << " i=" << i;
         EXPECT_EQ(i, bv.select1(i)) << " i=" << i;
@@ -114,9 +114,9 @@ TEST(Rsdic, random)
 
     Rsdic bv;
     bvb.build(bv);
-    EXPECT_EQ(n, bv.num());
+    EXPECT_EQ(n, bv.size());
     int sum = 0;
-    for (size_t i = 0; i < bv.num(); ++i) {
+    for (size_t i = 0; i < bv.size(); ++i) {
         EXPECT_EQ(B[i]  , bv.get_bit(i)) << " i=" << i;
         std::pair<uint64_t, uint64_t> bit_rank = bv.get_bit_and_rank(i);
         EXPECT_EQ(B[i], bit_rank.first);
@@ -146,11 +146,11 @@ TEST(Rsdic, random)
 TEST(Rsdic, large)
 {
     RsdicBuilder rsdb;
-    const uint64_t n = 26843545;
+    const uint64_t n = 16llu * 1024llu * 1024llu; // 4MB
     std::vector<uint64_t> poses;
     for (uint64_t i = 0; i < n; ++i) {
         float r = (float)rand() / RAND_MAX;
-        if (r < 0.001) {
+        if (r < 0.5) {
             rsdb.push_back(1);
             poses.push_back(i);
         } else rsdb.push_back(0);
