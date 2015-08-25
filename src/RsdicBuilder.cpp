@@ -103,6 +103,8 @@ void RsdicBuilder::build(Rsdic& bv)
         return;
 
     _write_block();
+    assert(_state == READY);
+
     bv.clear();
     bv._num                 = _bit_num;
     bv._one_num             = _one_num;
