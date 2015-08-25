@@ -44,7 +44,7 @@ public:
 
   virtual uint64_t size() const override { return this->_num; }
 
-  std::pair<uint64_t, uint64_t> get_bit_and_rank(uint64_t pos) const;
+  void get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const;
   bool operator == (const Rsdic& bv) const;
 
   // Allows us to load the tree quickly

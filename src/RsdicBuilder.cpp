@@ -68,6 +68,22 @@ void RsdicBuilder::push_back(const bool bit)
     ++_bit_num;
 }
 
+void RsdicBuilder::add_string(const std::string &str)
+{
+    for (const auto &ch: str) {
+        switch (ch) {
+        case '0':
+            this->push_back(0);
+            break;
+        case '1':
+            this->push_back(1);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 void RsdicBuilder::_write_block()
 {
     if (_bit_num > 0) {

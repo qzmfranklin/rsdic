@@ -55,45 +55,47 @@ bool Rsdic::get_bit(uint64_t pos) const
 
 uint64_t Rsdic::rank0(const uint64_t pos) const
 {
-    uint64_t lblock = pos / kLargeBlockSize;
+    const uint64_t pos2 = pos + 1;
+    uint64_t lblock = pos2 / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t sblock = pos2 / kSmallBlockSize;
     uint64_t rank = _rank_blocks[lblock];
     for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
         uint64_t rank_sb = _rank_small_blocks[i];
         rank += rank_sb;
         pointer += EnumCoder::len(rank_sb);
     }
-    if (pos % kSmallBlockSize == 0) {
-        return pos - rank;
+    if (pos2 % kSmallBlockSize == 0) {
+        return pos2 - rank;
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
-    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
-    return pos - rank;
+    rank += EnumCoder::rank(code, rank_sb, pos2 % kSmallBlockSize);
+    return pos2 - rank;
 }
 
 uint64_t Rsdic::rank1(const uint64_t pos) const
 {
-    uint64_t lblock = pos / kLargeBlockSize;
+    const uint64_t pos2 = pos + 1;
+    uint64_t lblock = pos2 / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t sblock = pos2 / kSmallBlockSize;
     uint64_t rank = _rank_blocks[lblock];
     for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
         uint64_t rank_sb = _rank_small_blocks[i];
         rank += rank_sb;
         pointer += EnumCoder::len(rank_sb);
     }
-    if (pos % kSmallBlockSize == 0) {
+    if (pos2 % kSmallBlockSize == 0) {
         return rank;
     }
     uint64_t rank_sb = _rank_small_blocks[sblock];
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
-    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
+    rank += EnumCoder::rank(code, rank_sb, pos2 % kSmallBlockSize);
     return rank;
 }
 
-pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(const uint64_t pos) const
+void Rsdic::get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const
 {
     uint64_t lblock = pos / kLargeBlockSize;
     uint64_t pointer = _pointer_blocks[lblock];
@@ -108,21 +110,26 @@ pair<uint64_t, uint64_t> Rsdic::get_bit_and_rank(const uint64_t pos) const
     uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
     rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
     uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
-    return make_pair(ret_bit, ret_bit ? rank : pos - rank);
+
+    *bit   = ret_bit;
+    *rank1 = ret_bit ? rank + 1 : pos - rank;
+
+    //return make_pair(ret_bit, ret_bit ? rank : pos - rank);
 }
 
 
 uint64_t Rsdic::select1(const uint64_t ind) const
 {
-    uint64_t select_ind = ind / kSelectBlockSize;
+    const uint64_t ind2 = ind - 1;
+    uint64_t select_ind = ind2 / kSelectBlockSize;
     uint64_t lblock = _select_one_inds[select_ind];
     for (; lblock < _rank_blocks.size(); ++lblock) {
-        if (ind < _rank_blocks[lblock]) break;
+        if (ind2 < _rank_blocks[lblock]) break;
     }
     --lblock;
     uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t remain = ind - _rank_blocks[lblock] + 1;
+    uint64_t remain = ind2 - _rank_blocks[lblock] + 1;
 
     for (; sblock < _rank_small_blocks.size(); ++sblock) {
         const uint64_t rank_sb = _rank_small_blocks[sblock];
@@ -137,16 +144,17 @@ uint64_t Rsdic::select1(const uint64_t ind) const
 
 uint64_t Rsdic::select0(const uint64_t ind) const
 {
-    uint64_t select_ind = ind / kSelectBlockSize;
+    const uint64_t ind2 = ind - 1;
+    uint64_t select_ind = ind2 / kSelectBlockSize;
     uint64_t lblock = _select_zero_inds[select_ind];
     for (; lblock < _rank_blocks.size(); ++lblock) {
-        if (lblock * kLargeBlockSize - _rank_blocks[lblock] > ind) break;
+        if (lblock * kLargeBlockSize - _rank_blocks[lblock] > ind2) break;
     }
     --lblock;
 
     uint64_t sblock = lblock * kSmallBlockPerLargeBlock;
     uint64_t pointer = _pointer_blocks[lblock];
-    uint64_t remain = ind - lblock * kLargeBlockSize + _rank_blocks[lblock] + 1;
+    uint64_t remain = ind2 - lblock * kLargeBlockSize + _rank_blocks[lblock] + 1;
 
     for (; sblock < _rank_small_blocks.size(); ++sblock) {
         const uint64_t rank_sb = kSmallBlockSize - _rank_small_blocks[sblock];
