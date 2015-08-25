@@ -34,11 +34,11 @@ public:
   void clear();
   virtual bool get_bit(const uint64_t pos) const override;
 
-  // number of 0/1's in [0, pos - 1]
+  // number of 0/1's in [0, pos]
   virtual uint64_t rank0(const uint64_t pos) const override;
   virtual uint64_t rank1(const uint64_t pos) const override;
 
-  // position of (ind + 1)-th 0/1
+  // position of ind-th 0/1
   virtual uint64_t select0(const uint64_t ind) const override;
   virtual uint64_t select1(const uint64_t ind) const override;
 
