@@ -162,13 +162,6 @@ uint64_t EnumCoder::select1(uint64_t code, uint64_t rank_sb, uint64_t num)
     abort();
 }
 
-uint64_t EnumCoder::select(uint64_t code, uint64_t rank_sb, uint64_t num, bool bit)
-{
-    if (num == 0) return 0;
-    if (bit) return select1(code, rank_sb, num);
-    else return select0(code, rank_sb, num);
-}
-
 const uint8_t EnumCoder::kEnumCodeLength_[65] = {
     0,  6,  11, 16, 20, 23, 27, 30, 33, 35, 38, 40, 42, 44, 46, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
