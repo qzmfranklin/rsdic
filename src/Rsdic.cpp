@@ -95,6 +95,12 @@ uint64_t Rsdic::rank1(const uint64_t pos) const
     return rank;
 }
 
+void Rsdic::get_bit_and_rank0(const uint64_t pos, bool *bit, uint64_t *rank0) const
+{
+    this->get_bit_and_rank1(pos, bit, rank0);
+    *rank0 = pos + 1 - *rank0;
+}
+
 void Rsdic::get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const
 {
     uint64_t lblock = pos / kLargeBlockSize;

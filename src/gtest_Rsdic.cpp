@@ -98,7 +98,7 @@ TEST(Rsdic, trivial_one)
 }
 
 
-TEST(Rsdic, random)
+TEST(Rsdic, get_bit_and_rank1)
 {
     RsdicBuilder bvb;
     std::vector<int> B;
