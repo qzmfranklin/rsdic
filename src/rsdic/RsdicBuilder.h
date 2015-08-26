@@ -20,16 +20,14 @@
 #ifndef RSDIC_RSDIC_BUILDER_HPP_
 #define RSDIC_RSDIC_BUILDER_HPP_
 
+#include "Type.h"
 #include <vector>
 #include <stdint.h>
-#include "Type.h"
 
 namespace rsdic{
 
 class Rsdic;
-
 class RsdicBuilder{
-
 public:
     void clear();
     void push_back(const bool bit);
@@ -58,6 +56,6 @@ private:
     rsdic_uint _zero_num = 0;
 };
 
-}
+} /* namespace rsdic */
 
 #endif // RSDIC_RSDIC_BUILDER_HPP_
