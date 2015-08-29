@@ -1,33 +1,43 @@
 #  THIS DIRECTORY
-DIR664d9902b5f6509479735f5bbd154703:=$(ROOT)/src/rx
+TMP:=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+$(TMP)DIR:=$(TMP)
+
 #  ALL C/C++ FILES IN THIS DIRECTORY (WITHOUT PATHNAME)
-$(DIR664d9902b5f6509479735f5bbd154703)C:=$(wildcard *.c)
-$(DIR664d9902b5f6509479735f5bbd154703)CPP:=$(wildcard *.cpp)
+$($(TMP)DIR)C:=$(wildcard *.c)
+$($(TMP)DIR)CC:=$(wildcard *.cc)
+$($(TMP)DIR)CPP:=$(wildcard *.cpp)
 #  DIRECTORY-SPECIFIC COMPILING FLAGS AND INCLUDE DIRECTORIES
-$(DIR664d9902b5f6509479735f5bbd154703)CFLAGS:=$(CFLAGS)
-$(DIR664d9902b5f6509479735f5bbd154703)CXXFLAGS:=$(CXXFLAGS)
-$(DIR664d9902b5f6509479735f5bbd154703)INCS:=$(INCS)
-$(DIR664d9902b5f6509479735f5bbd154703)LIBS:=$(LIBS)
+$($(TMP)DIR)CFLAGS:=$(CFLAGS)
+$($(TMP)DIR)CXXFLAGS:=$(CXXFLAGS)
+$($(TMP)DIR)INCS:=$(INCS)
+$($(TMP)DIR)LIBS:=$(LIBS)
 
-DEP+=$($(DIR664d9902b5f6509479735f5bbd154703)CPP:%.cpp=$(DIR664d9902b5f6509479735f5bbd154703)/%.d) $($(DIR664d9902b5f6509479735f5bbd154703)C:%.c=$(DIR664d9902b5f6509479735f5bbd154703)/%.d)
-OBJ+=$($(DIR664d9902b5f6509479735f5bbd154703)CPP:%.cpp=$(DIR664d9902b5f6509479735f5bbd154703)/%.o) $($(DIR664d9902b5f6509479735f5bbd154703)C:%.c=$(DIR664d9902b5f6509479735f5bbd154703)/%.o)
-ASM+=$($(DIR664d9902b5f6509479735f5bbd154703)CPP:%.cpp=$(DIR664d9902b5f6509479735f5bbd154703)/%.s) $($(DIR664d9902b5f6509479735f5bbd154703)C:%.c=$(DIR664d9902b5f6509479735f5bbd154703)/%.s)
+DEP:=$(DEP) $($($(TMP)DIR)C:%.c=$($(TMP)DIR)/%.d) $($($(TMP)DIR)CC:%.cc=$($(TMP)DIR)/%.d) $($($(TMP)DIR)CPP:%.cpp=$($(TMP)DIR)/%.d)
+OBJ:=$(OBJ) $($($(TMP)DIR)C:%.c=$($(TMP)DIR)/%.o) $($($(TMP)DIR)CC:%.cc=$($(TMP)DIR)/%.o) $($($(TMP)DIR)CPP:%.cpp=$($(TMP)DIR)/%.o)
+ASM:=$(ASM) $($($(TMP)DIR)C:%.c=$($(TMP)DIR)/%.s) $($($(TMP)DIR)CC:%.cc=$($(TMP)DIR)/%.s) $($($(TMP)DIR)CPP:%.cpp=$($(TMP)DIR)/%.s)
 
-$(DIR664d9902b5f6509479735f5bbd154703)/%.o: $(DIR664d9902b5f6509479735f5bbd154703)/%.c
-	$(QUIET)$(CC) -o $@ -c $< $(DEPFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)CFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)INCS)
+$($(TMP)DIR)/%.o: $($(TMP)DIR)/%.c
+	$(QUIET)$(CC) -o $@ -c $< $(DEPFLAGS) $($($(TMP)DIR)CFLAGS) $($($(TMP)DIR)INCS)
 	$(QUIET)echo "Compiling $(GREEN)$(notdir $<) $(NONE)..."
-$(DIR664d9902b5f6509479735f5bbd154703)/%.s: $(DIR664d9902b5f6509479735f5bbd154703)/%.c
-	$(QUIET)$(CC) -o $@ $< $(ASMFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)CFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)INCS)
+$($(TMP)DIR)/%.s: $($(TMP)DIR)/%.c
+	$(QUIET)$(CC) -o $@ $< $(ASMFLAGS) $($($(TMP)DIR)CFLAGS) $($($(TMP)DIR)INCS)
 	$(QUIET)echo "Assembly listing $(CYAN)$(notdir $<) $(NONE)..."
 
-$(DIR664d9902b5f6509479735f5bbd154703)/%.o: $(DIR664d9902b5f6509479735f5bbd154703)/%.cpp
-	$(QUIET)$(CXX) -o $@ -c $< $(DEPFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)CXXFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)INCS)
+$($(TMP)DIR)/%.o: $($(TMP)DIR)/%.cc
+	$(QUIET)$(CXX) -o $@ -c $< $(DEPFLAGS) ${$($(TMP)DIR)CXXFLAGS} ${$($(TMP)DIR)INCS}
 	$(QUIET)echo "Compiling $(GREEN)$(notdir $<) $(NONE)..."
-$(DIR664d9902b5f6509479735f5bbd154703)/%.s: $(DIR664d9902b5f6509479735f5bbd154703)/%.cpp
-	$(QUIET)$(CXX) -o $@ $< $(ASMFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)CXXFLAGS) $($(DIR664d9902b5f6509479735f5bbd154703)INCS)
+$($(TMP)DIR)/%.s: $($(TMP)DIR)/%.cc
+	$(QUIET)$(CXX) -o $@ $< $(ASMFLAGS) ${$($(TMP)DIR)CXXFLAGS} ${$($(TMP)DIR)INCS}
+	$(QUIET)echo "Assembly listing $(CYAN)$(notdir $<) $(NONE)..."
+
+$($(TMP)DIR)/%.o: $($(TMP)DIR)/%.cpp
+	$(QUIET)$(CXX) -o $@ -c $< $(DEPFLAGS) $($($(TMP)DIR)CXXFLAGS) $($($(TMP)DIR)INCS)
+	$(QUIET)echo "Compiling $(GREEN)$(notdir $<) $(NONE)..."
+$($(TMP)DIR)/%.s: $($(TMP)DIR)/%.cpp
+	$(QUIET)$(CXX) -o $@ $< $(ASMFLAGS) $($($(TMP)DIR)CXXFLAGS) $($($(TMP)DIR)INCS)
 	$(QUIET)echo "Assembly listing $(CYAN)$(notdir $<) $(NONE)..."
 
 # Linking pattern rule for this directory
-%.exe: $(DIR664d9902b5f6509479735f5bbd154703)/%.o
-	$(QUIET)$(CXX) -o $@ $^ $($(DIR664d9902b5f6509479735f5bbd154703)LIBS)
+%.exe: $($(TMP)DIR)/%.o
+	$(QUIET)$(CXX) -o $@ $^ $($($(TMP)DIR)LIBS)
 	$(QUIET)echo "Linking $(MAGENTA)$(notdir $@) $(NONE)..."
