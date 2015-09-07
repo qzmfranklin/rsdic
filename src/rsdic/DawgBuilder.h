@@ -7,9 +7,12 @@
 class DawgBuilder {
 public:
     ~DawgBuilder();
-    void add_wordlist(const std::vector<std::string> &&wordlist);
+    void make_root();
+    void add_word(const std::string &&);
     void build();
     std::string export_as_binary_string() const;
+
+    std::vector<std::string> export_all_words_debug() const;
 private:
     class Node;
     Node *_root = nullptr;
