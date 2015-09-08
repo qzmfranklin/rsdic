@@ -138,7 +138,7 @@ void DawgBuilder::add_word(const std::string &&word)
     }
 
     // Set the EndOfWord flag
-    //curr->set_eow();
+    curr->set_eow();
 }
 
 void DawgBuilder::build()
@@ -161,13 +161,18 @@ std::vector<std::string> DawgBuilder::export_all_words_debug() const
     while(!s.empty()) {
         const Node *curr = s.top();
         s.pop();
+        for (const Node *p: curr->_child_list)
+            s.push(p);
         if (curr->is_eow()) {
             std::string word;
             for (const Node *p = curr; p->_parent; p = p->_parent)
                 word.insert(0, 1, static_cast<const char>(p->_val));
+            //fprintf(stderr,"%s\n", word.c_str());
             out.push_back(std::move(word));
         }
     }
+
+    std::sort(out.begin(), out.end());
 
     return out;
 }
