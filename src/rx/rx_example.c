@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 /* small utilities to handle memory blocks */
 struct image {
     unsigned char *ptr;

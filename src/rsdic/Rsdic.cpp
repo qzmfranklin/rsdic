@@ -191,7 +191,6 @@ void _load(std::istream& is, std::vector<T>& vs) {
 
 } // anonymous namespace
 
-// Deprecated
 void Rsdic::save(std::ostream& os) const
 {
     os.write((const char*)&_num, sizeof(_num));
@@ -204,7 +203,6 @@ void Rsdic::save(std::ostream& os) const
     _save(os, _rank_small_blocks);
 }
 
-// Deprecated
 void Rsdic::load(std::istream& is)
 {
     is.read((char*)&_num, sizeof(_num));

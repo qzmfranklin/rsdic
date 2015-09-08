@@ -8,7 +8,7 @@ D	:=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 # List all the executables you want to run when you type `make test` in $(TESTS)
 # Note that you need to -include $(ROOT)/gtest/rules.mk to actually build those
 # executables
-TESTS:=rx_example.exe rx_test.exe
+TESTS:=rx_example.exe rx_test.exe gtest_rx.exe
 
 .PHONY: all asm clean test
 all: $(OBJ)
@@ -23,3 +23,4 @@ test: $(TESTS)
 #gtest_dag.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_dag.o $(D)/dag.o
 rx_example.exe: $(D)/rx_example.o $(D)/rx.o
 rx_test.exe: $(D)/rx_test.o $(D)/rx.o
+gtest_rx.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_rx.o $(D)/rx.o

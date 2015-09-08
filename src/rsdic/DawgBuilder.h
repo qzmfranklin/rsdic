@@ -9,10 +9,12 @@ public:
     ~DawgBuilder();
     void make_root();
     void add_word(const std::string &&);
-    void build();
-    std::string export_as_binary_string() const;
 
-    std::vector<std::string> export_all_words_debug() const;
+    std::string export_louds(const std::string &sep = "") const;
+    std::string export_data() const;
+
+    std::string export_ascii_debug() const;
+    std::vector<std::string> export_sorted_wordlist_debug() const;
 private:
     class Node;
     Node *_root = nullptr;

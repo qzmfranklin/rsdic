@@ -43,13 +43,10 @@ void RsdicBuilder::clear()
     _one_num = 0;
     _prev_one_num = 0;
     _zero_num = 0;
-
-    _state = EMPTY;
 }
 
 void RsdicBuilder::push_back(const bool bit)
 {
-    assert(_state == EMPTY);
     if (_bit_num % kSmallBlockSize == 0) {
         _write_block();
     }
@@ -114,12 +111,10 @@ void RsdicBuilder::_write_block()
 
 Rsdic RsdicBuilder::build()
 {
-    assert(_state == EMPTY);
     if (_bit_num == 0)
         return Rsdic();
 
     _write_block();
-    assert(_state == READY);
     Rsdic out;
     out._num                 = _bit_num;
     out._one_num             = _one_num;

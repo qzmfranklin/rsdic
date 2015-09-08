@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
-
-
 // Align to 4bytes boundary.
 class BytesAligner {
 public:

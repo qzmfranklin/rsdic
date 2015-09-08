@@ -24,10 +24,10 @@
 #include <vector>
 #include <stdint.h>
 
-namespace rsdic{
+namespace rsdic {
 
 class Rsdic;
-class RsdicBuilder{
+class RsdicBuilder {
 public:
     void clear();
     void push_back(const bool bit);
@@ -35,11 +35,6 @@ public:
     Rsdic build();
 
 private:
-    enum {
-        EMPTY,
-        READY
-    } _state = EMPTY;
-
     void _write_block();
 
     std::vector<uint64_t> _bits;

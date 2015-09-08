@@ -9,7 +9,7 @@
  */
 class DawgBuilder::Node {
 public:
-    typedef uint16_t val_t; // value type
+    typedef char val_t; // value type
     friend DawgBuilder;
 
     Node(const val_t val): _val(val) {}
@@ -45,30 +45,38 @@ public:
      * Caveat: If it is a tree, each node is only visited once. If it is a DAG,
      * no such guarantee yet (TODO)
      */
-    void breadth_first_traverse(const std::function<void(Node*)> &fn)
+    std::string breadth_first_traverse(const std::function<std::string (const Node*)> &fn)
     {
-        std::queue<Node*> s;
+        std::string out;
+
+        std::queue<const Node*> s;
         s.push(this);
         while(!s.empty()) {
-            Node *curr = s.front();
+            const Node *curr = s.front();
             s.pop();
+            out += fn(curr);
             for (auto p: curr->_child_list)
                 s.push(p);
-            fn(curr);
         }
+
+        return out;
     }
 
-    void depth_first_traverse(const std::function<void(Node*)> &fn)
+    std::string depth_first_traverse(const std::function<std::string(const Node*)> &fn)
     {
-        std::stack<Node*> s;
+        std::string out;
+
+        std::stack<const Node*> s;
         s.push(this);
         while(!s.empty()) {
-            Node *curr = s.top();
+            const Node *curr = s.top();
             s.pop();
+            out += fn(curr);
             for (auto p: curr->_child_list)
                 s.push(p);
-            fn(curr);
         }
+
+        return out;
     }
 
     /*
@@ -141,18 +149,63 @@ void DawgBuilder::add_word(const std::string &&word)
     curr->set_eow();
 }
 
-void DawgBuilder::build()
+std::string DawgBuilder::export_louds(const std::string &sep) const
 {
     // Sort the child list by alphabetical order
-    //this->_root->breadth_first_traverse(Node::sort_child_list);
+    return _root->breadth_first_traverse([&sep] (const Node *p) -> std::string {
+        const size_t len = 200;
+        size_t offset = 0;
+        char buf[len];
+
+        const size_t num_child = p->_child_list.size();
+        for (size_t i = 0; i < num_child; i++)
+            offset += snprintf(buf + offset, len, "1");
+        offset += snprintf(buf + offset, len, "0");
+
+        return std::string(buf) + sep;
+    });
 }
 
-std::string DawgBuilder::export_as_binary_string() const
+std::string DawgBuilder::export_data() const
 {
-    return std::string();
+    // Sort the child list by alphabetical order
+    std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
+        const size_t len = 8;
+        char buf[len];
+        size_t  offset = 0;
+        offset += snprintf(buf + offset, len, "%X", p->_val);
+        if (p->is_eow())
+            offset += snprintf(buf + offset, len, "\tEOW");
+        offset += snprintf(buf + offset, len, "\n");
+        return std::string(buf);
+    });
+    tmp.pop_back(); // remove trailing '\n'
+    return tmp;
 }
 
-std::vector<std::string> DawgBuilder::export_all_words_debug() const
+std::string DawgBuilder::export_ascii_debug() const
+{
+    // Sort the child list by alphabetical order
+    std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
+        const size_t len = 256;
+        size_t offset = 0;
+        char buf[len];
+
+        offset += snprintf(buf + offset, len, "%X", p->_val);
+        offset += snprintf(buf + offset, len, "\t");
+        const size_t num_child = p->_child_list.size();
+        for (size_t i = 0; i < num_child; i++)
+            offset += snprintf(buf + offset, len, "1");
+        offset += snprintf(buf + offset, len, "0");
+        offset += snprintf(buf + offset, len, "\n");
+
+        return std::string(buf);
+    });
+    tmp.pop_back();
+    return tmp;
+}
+
+std::vector<std::string> DawgBuilder::export_sorted_wordlist_debug() const
 {
     std::vector<std::string> out;
 
@@ -161,7 +214,7 @@ std::vector<std::string> DawgBuilder::export_all_words_debug() const
     while(!s.empty()) {
         const Node *curr = s.top();
         s.pop();
-        for (const Node *p: curr->_child_list)
+        for (const auto p: curr->_child_list)
             s.push(p);
         if (curr->is_eow()) {
             std::string word;

@@ -1,3 +1,5 @@
+#include "Rsdic.h"
+#include "RsdicBuilder.h"
 #include "DawgBuilder.h"
 #include <gtest/gtest.h>
 #include <stdio.h>
@@ -12,7 +14,7 @@ TEST(DawgBuilder, input) {
 
     DawgBuilder g;
     std::vector<std::string> wordlist0;
-    {
+    { // Add words from the word list to the dawg
         g.make_root();
 
         char *buf = NULL;
@@ -32,12 +34,22 @@ TEST(DawgBuilder, input) {
         std::sort(wordlist0.begin(), wordlist0.end());
     }
 
-    {
-        const std::vector<std::string> wordlist1 = g.export_all_words_debug();
+    { // Test that the dawg has and only has all orignal words
+        // Caveat: wordlist0 and wordlist1 must be sorted to allow easy comparison
+        const std::vector<std::string> wordlist1 = g.export_sorted_wordlist_debug();
         EXPECT_EQ(wordlist0.size(), wordlist1.size());
         for(size_t i = 0; i < wordlist1.size(); i++)
             EXPECT_EQ(wordlist0[i], wordlist1[i]);
     }
 
-    //g.build();
+    rsdic::Rsdic v;
+    { // Build bit vector
+        //std::string tmp = g.export_ascii_debug();
+        std::string data  = g.export_data();
+        std::string louds = g.export_louds();
+
+        rsdic::RsdicBuilder builder;
+        builder.add_string(louds);
+        v = builder.build();
+    }
 }
