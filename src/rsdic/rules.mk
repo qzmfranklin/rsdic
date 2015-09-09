@@ -12,9 +12,9 @@ $($(TMP)DIR)CXXFLAGS:=$(CXXFLAGS)
 $($(TMP)DIR)INCS:=$(INCS)
 $($(TMP)DIR)LIBS:=$(LIBS)
 
-DEP:=$(DEP) $($($(TMP)DIR)C:%.c=%.d) $($($(TMP)DIR)CC:%.cc=%.d) $($($(TMP)DIR)CPP:%.cpp=%.d)
-OBJ:=$(OBJ) $($($(TMP)DIR)C:%.c=%.o) $($($(TMP)DIR)CC:%.cc=%.o) $($($(TMP)DIR)CPP:%.cpp=%.o)
-ASM:=$(ASM) $($($(TMP)DIR)C:%.c=%.s) $($($(TMP)DIR)CC:%.cc=%.s) $($($(TMP)DIR)CPP:%.cpp=%.s)
+DEP:=$(DEP) $($(TMP)C:%.c=%.d) $($(TMP)CC:%.cc=%.d) $($(TMP)CPP:%.cpp=%.d)
+OBJ:=$(OBJ) $($(TMP)C:%.c=%.o) $($(TMP)CC:%.cc=%.o) $($(TMP)CPP:%.cpp=%.o)
+ASM:=$(ASM) $($(TMP)C:%.c=%.s) $($(TMP)CC:%.cc=%.s) $($(TMP)CPP:%.cpp=%.s)
 
 $($(TMP)DIR)/%.o: $($(TMP)DIR)/%.c
 	$(QUIET)$(CC) -o $@ -c $< $(DEPFLAGS) $($($(TMP)DIR)CFLAGS) $($($(TMP)DIR)INCS)
