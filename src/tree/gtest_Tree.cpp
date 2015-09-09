@@ -1,10 +1,10 @@
-#include "Rsdic.h"
-#include "RsdicBuilder.h"
-#include "DawgBuilder.h"
+#include "src/rsdic/Rsdic.h"
+#include "src/rsdic/RsdicBuilder.h"
+#include "Tree.h"
 #include <gtest/gtest.h>
 #include <stdio.h>
 
-TEST(DawgBuilder, input) {
+TEST(Tree, input) {
     const char fname[] = "wordlist.txt";
     FILE *fp = fopen(fname, "r");
     if (!fp) {
@@ -12,7 +12,7 @@ TEST(DawgBuilder, input) {
         exit(1);
     }
 
-    DawgBuilder g;
+    Tree g;
     std::vector<std::string> wordlist0;
     { // Add words from the word list to the dawg
         g.make_root();

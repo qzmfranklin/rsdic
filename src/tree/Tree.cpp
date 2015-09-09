@@ -1,4 +1,4 @@
-#include "DawgBuilder.h"
+#include "Tree.h"
 
 #include <functional>
 #include <queue>
@@ -7,10 +7,10 @@
 /*
  * T is the letter type.
  */
-class DawgBuilder::Node {
+class Tree::Node {
 public:
     typedef char val_t; // value type
-    friend DawgBuilder;
+    friend Tree;
 
     Node(const val_t val): _val(val) {}
 
@@ -105,20 +105,20 @@ private:
     bool _is_eow = false;
     Node *_parent = nullptr;
     std::vector<Node*> _child_list;
-}; /* class DawgBuilder::Node */
+}; /* class Tree::Node */
 
-DawgBuilder::~DawgBuilder()
+Tree::~Tree()
 {
     if (_root)
         Node::release(this->_root);
 }
 
-void DawgBuilder::make_root()
+void Tree::make_root()
 {
     this->_root = new Node(0);
 }
 
-void DawgBuilder::add_word(const std::string &&word)
+void Tree::add_word(const std::string &&word)
 {
     //fprintf(stderr,"    %s\n", word.c_str());
 
@@ -149,7 +149,7 @@ void DawgBuilder::add_word(const std::string &&word)
     curr->set_eow();
 }
 
-std::string DawgBuilder::export_louds(const std::string &sep) const
+std::string Tree::export_louds(const std::string &sep) const
 {
     // Sort the child list by alphabetical order
     return _root->breadth_first_traverse([&sep] (const Node *p) -> std::string {
@@ -166,7 +166,7 @@ std::string DawgBuilder::export_louds(const std::string &sep) const
     });
 }
 
-std::string DawgBuilder::export_data() const
+std::string Tree::export_data() const
 {
     // Sort the child list by alphabetical order
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
@@ -183,7 +183,7 @@ std::string DawgBuilder::export_data() const
     return tmp;
 }
 
-std::string DawgBuilder::export_ascii_debug() const
+std::string Tree::export_ascii_debug() const
 {
     // Sort the child list by alphabetical order
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
@@ -205,7 +205,7 @@ std::string DawgBuilder::export_ascii_debug() const
     return tmp;
 }
 
-std::vector<std::string> DawgBuilder::export_sorted_wordlist_debug() const
+std::vector<std::string> Tree::export_sorted_wordlist_debug() const
 {
     std::vector<std::string> out;
 

@@ -1,12 +1,12 @@
-#ifndef __DawgBuilder__h__
-#define __DawgBuilder__h__
+#ifndef __Tree__h__
+#define __Tree__h__
 
 #include <string>
 #include <vector>
 
-class DawgBuilder {
+class Tree {
 public:
-    ~DawgBuilder();
+    ~Tree();
     void make_root();
     void add_word(const std::string &&);
 
@@ -21,4 +21,4 @@ private:
     std::vector<std::string> _wordlist;
 };
 
-#endif /* end of include guard __RsdicDawgBuilder__h__ */
+#endif /* end of include guard __Tree__h__ */

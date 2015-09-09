@@ -9,7 +9,7 @@ D       :=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))# this directory
 # Note that you need to -include $(ROOT)/gtest/rules.mk to actually build those
 # executables
 TESTS:=gtest_Rsdic.exe gtest_RsdicBuilder.exe gtest_Util.exe gtest_EnumCoder.exe \
-	gtest_BytesAligner.exe gtest_DawgBuilder.exe
+	gtest_BytesAligner.exe
 
 .PHONY: all asm clean test
 all: $(OBJ)
@@ -28,5 +28,3 @@ gtest_RsdicBuilder.exe: $(D)/gtest_RsdicBuilder.o $(D)/RsdicBuilder.o $(ROOT)/gt
 gtest_Util.exe: $(D)/gtest_Util.o $(ROOT)/gtest/gtest_main.a
 gtest_EnumCoder.exe: $(D)/gtest_EnumCoder.o $(D)/EnumCoder.o $(ROOT)/gtest/gtest_main.a
 gtest_BytesAligner.exe: $(D)/gtest_BytesAligner.o $(ROOT)/gtest/gtest_main.a
-gtest_DawgBuilder.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_DawgBuilder.o \
-	$(D)/RsdicBuilder.o $(D)/Rsdic.o $(D)/DawgBuilder.o $(D)/EnumCoder.o
