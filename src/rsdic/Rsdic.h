@@ -60,6 +60,7 @@ public:
   void save(std::ostream &os) const;
   void load(std::istream &is);
 
+  uint64_t get_usage_bytes() const;
   /**
    * This is only needed fro RsdicBuilder::build(Rsdic&).
    * TODO: Remove this!
@@ -67,7 +68,6 @@ public:
   friend class RsdicBuilder;
 
 private:
-  uint64_t get_usage_bytes() const;
   uint64_t num() const{ return _num; }
   uint64_t one_num() const{ return _one_num; }
   uint64_t zero_num() const{ return _num - _one_num; }

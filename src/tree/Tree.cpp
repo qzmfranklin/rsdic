@@ -170,7 +170,7 @@ std::string Tree::export_data() const
 {
     // Sort the child list by alphabetical order
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
-        const size_t len = 8;
+        const size_t len = 200;
         char buf[len];
         size_t  offset = 0;
         offset += snprintf(buf + offset, len, "%X", p->_val);
