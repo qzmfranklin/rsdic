@@ -53,9 +53,9 @@ TEST(Tree, input) {
 
     rsdic::Rsdic v;
     struct rbx *rbx = nullptr;
-    const char *ofname = "OUTPUT/dict.dat";
-    std::ofstream os;
-    os.open(ofname, std::ios_base::out);
+    //const char *ofname = "OUTPUT/dict.dat";
+    //std::ofstream os;
+    //os.open(ofname, std::ios_base::out);
     { // Build bit vector and rbx data
         //std::string tmp = g.export_ascii_debug();
         std::string data  = g.export_data();
@@ -67,7 +67,7 @@ TEST(Tree, input) {
             rsdic::RsdicBuilder builder;
             builder.add_string(louds);
             v = builder.build();
-            v.save(os);
+            //v.save(os);
             printf("bitvec size = %llu\n", v.get_usage_bytes());
         }
 
@@ -119,7 +119,7 @@ TEST(Tree, input) {
                 const unsigned char *buf = rbx_builder_get_image(builder);
                 const int size = rbx_builder_get_size(builder);
                 unsigned char *data = (unsigned char*) malloc(size);
-                os.write((const char*)data, size);
+                //os.write((const char*)data, size);
                 assert(data);
                 memcpy(data, buf, size);
                 rbx = rbx_open(data);
