@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+/*
+ * This is a playground class for testing the Dag class. I believe that I had
+ * enough experience to move on to the more complicated Dag class now that I
+ * have finished the Tree class.
+ */
 class Tree {
 public:
     ~Tree();

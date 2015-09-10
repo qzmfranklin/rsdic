@@ -1,13 +1,13 @@
-#include "Tree.h"
+#include "Dag.h"
 
 #include <functional>
 #include <queue>
 #include <stack>
 
-class Tree::Node {
+class Dag::Node {
 public:
     typedef char val_t; // value type
-    friend Tree;
+    friend Dag;
 
     Node(const val_t val): _val(val) {}
 
@@ -35,12 +35,26 @@ public:
     }
 
     /*
+     * Set _color of all nodes to WHITE
+     *
+     * Pre-order, recursive implementation
+     */
+    void bleach()
+    {
+        _color = WHITE;
+        for (auto p: _child_list)
+            bleach(p);
+    }
+
+    /*
      * Visit nodes spawned by this node with the given visitor function
      *
      * Breadth first and depth first
      *
-     * Caveat: If it is a tree, each node is only visited once. If it is a DAG,
-     * no such guarantee yet (TODO)
+     * In order to make sure visit each node only once, we use a color flag
+     * Node::_color:
+     *          WHITE       untouched
+     *          BLACK       stacked or queued
      */
     std::string breadth_first_traverse(const std::function<std::string (const Node*)> &fn)
     {
@@ -48,13 +62,20 @@ public:
 
         std::queue<const Node*> s;
         s.push(this);
+        this->_color = BLACK;
         while(!s.empty()) {
             const Node *curr = s.front();
             s.pop();
             out += fn(curr);
+            //curr->_color = BLACK;
             for (auto p: curr->_child_list)
-                s.push(p);
+                if (p->_color == WHITE) {
+                    s.push(p);
+                    p->_color = BLACK;
+                }
         }
+
+        this->bleach();
 
         return out;
     }
@@ -65,54 +86,70 @@ public:
 
         std::stack<const Node*> s;
         s.push(this);
+        this->_color = BLACK;
         while(!s.empty()) {
             const Node *curr = s.top();
             s.pop();
+            //curr->_color = BLACK;
             out += fn(curr);
             for (auto p: curr->_child_list)
-                s.push(p);
+                if (p->_color == WHITE) {
+                    s.push(p);
+                    p->_color = BLACK;
+                }
         }
+
+        this->bleach();
 
         return out;
     }
 
     /*
-     * Release memory starting from this node
+     * Release memory starting from the root node
+     *
+     * The root node is also released
      */
     static void release(Node *root)
     {
-        if (root->_parent)
-            std::remove(root->_parent->_child_list.begin(), root->_parent->_child_list.end(), root);
+        for (Node* p: root->_parent_list)
+            std::remove(p->_child_list.begin(), p->_child_list.end(), root);
+
         std::stack<Node*> s;
         s.push(root);
+        root->_color = BLACK;
         while(!s.empty()) {
             Node *curr = s.top();
             s.pop();
+            //s->_color = BLACK;
             for (const auto q: curr->_child_list)
-                s.push(q);
+                if (q->_color == WHITE) {
+                    s.push(q);
+                    q->_color = BLACK;
+                }
             delete curr;
         }
     }
 
 private:
     val_t _val = 0;
+    enum { WHITE, BLACK } _color = WHITE;
     bool _is_eow = false;
-    Node *_parent = nullptr;
+    std::vector<Node*> _parent_list;
     std::vector<Node*> _child_list;
-}; /* class Tree::Node */
+}; /* class Dag::Node */
 
-Tree::~Tree()
+Dag::~Dag()
 {
     if (_root)
         Node::release(this->_root);
 }
 
-void Tree::make_root()
+void Dag::make_root()
 {
     this->_root = new Node(0);
 }
 
-void Tree::add_word(const std::string &&word)
+void Dag::add_word(const std::string &&word)
 {
     //fprintf(stderr,"    %s\n", word.c_str());
 
@@ -143,7 +180,7 @@ void Tree::add_word(const std::string &&word)
     curr->set_eow();
 }
 
-std::string Tree::export_louds(const std::string &sep) const
+std::string Dag::export_louds(const std::string &sep) const
 {
     // Sort the child list by alphabetical order
     return _root->breadth_first_traverse([&sep] (const Node *p) -> std::string {
@@ -160,7 +197,7 @@ std::string Tree::export_louds(const std::string &sep) const
     });
 }
 
-std::string Tree::export_data() const
+std::string Dag::export_data() const
 {
     // Sort the child list by alphabetical order
     //std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
@@ -178,7 +215,7 @@ std::string Tree::export_data() const
     return tmp;
 }
 
-std::string Tree::export_ascii_debug() const
+std::string Dag::export_ascii_debug() const
 {
     // Sort the child list by alphabetical order
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
@@ -200,7 +237,7 @@ std::string Tree::export_ascii_debug() const
     return tmp;
 }
 
-std::vector<std::string> Tree::export_sorted_wordlist_debug() const
+std::vector<std::string> Dag::export_sorted_wordlist_debug() const
 {
     std::vector<std::string> out;
 
