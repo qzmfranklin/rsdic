@@ -11,7 +11,7 @@
 TEST(Tree, input) {
     std::string fname = os::path::realpath(os::path::join({
                 os::path::dirname(__FILE__),
-                "graph/test_data/highlights/el-GR.txt"
+                "test_data/highlights/el-GR.txt"
             }));
     FILE *fp = fopen(fname.c_str(), "r");
     if (!fp) {
