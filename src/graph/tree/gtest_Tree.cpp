@@ -1,3 +1,4 @@
+#include "src/os/path.h"
 #include "src/succinct/rsdic/Rsdic.h"
 #include "src/succinct/rsdic/RsdicBuilder.h"
 #include "src/succinct/rx/rx.h"
@@ -8,10 +9,13 @@
 #include <stdio.h>
 
 TEST(Tree, input) {
-    const char fname[] = "test_data/highlights/el-GR.txt";
-    FILE *fp = fopen(fname, "r");
+    std::string fname = os::path::realpath(os::path::join({
+                os::path::dirname(__FILE__),
+                "../test_data/highlights/el-GR.txt"
+            }));
+    FILE *fp = fopen(fname.c_str(), "r");
     if (!fp) {
-        fprintf(stderr,"Cannot open file: %s\n", fname);
+        fprintf(stderr,"Cannot open file: %s\n", fname.c_str());
         exit(1);
     }
 
