@@ -1,7 +1,8 @@
-ROOT    :=$(realpath ..)
+ROOT    :=$(realpath ../..)
 D       :=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))# this directory
 -include $(ROOT)/root.mk
 -include $(ROOT)/gtest/rules.mk
+-include $(ROOT)/src/rules.mk
 -include $(D)/rules.mk
 # Inlcude more rules.mk here if you this directory depends on them.
 -include $(DEP)
