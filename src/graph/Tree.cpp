@@ -6,6 +6,8 @@
 
 #include <assert.h>
 
+namespace graph {
+
 class Tree::Node {
 public:
     typedef char val_t; // value type
@@ -226,3 +228,5 @@ std::vector<std::string> Tree::export_sorted_wordlist_debug() const
 
     return out;
 }
+
+} /* namespace graph */

@@ -15,7 +15,7 @@ TEST(Tree, input) {
         exit(1);
     }
 
-    Tree g;
+    graph::Tree g;
     std::vector<std::string> wordlist0;
     { // Add words from the word list to the dawg
         g.make_root();
