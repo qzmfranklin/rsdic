@@ -16,7 +16,7 @@ public:
 
     void add_child(Node *p)
     {
-        p->_parent = this;
+        p->_parent_list.push_back(this);
         this->_child_list.push_back(p);
     }
 
@@ -35,15 +35,41 @@ public:
     }
 
     /*
-     * Set _color of all nodes to WHITE
+     * Use the _color field with stack to verify that the directed graph
+     * starting from this node is a dag
      *
-     * Pre-order, recursive implementation
+     * Uses the theory that:
+     *      A graph G, directed or not, is cyclic iff. a DFS yields a back edge
+     *
+     * In this function, _color is defined as:
+     *          WHITE       untouched
+     *          GREY        stacked
+     *          BLACK       visited
+     * With this definition, a back edge is an edge whose ending node is BLACK
      */
-    void bleach()
+    bool verify_dag() const
     {
-        _color = WHITE;
-        for (auto p: _child_list)
-            bleach(p);
+        std::stack<const Node*> s;
+        s.push(this);
+        this->_color = GREY;
+        while(!s.empty()) {
+            const Node *curr = s.top();
+            s.pop();
+            curr->_color = BLACK;
+            for (const Node *p: curr->_child_list)
+                switch (p->_color) {
+                case WHITE:
+                    s.push(p);
+                    p->_color = GREY;
+                    break;
+                case GREY:
+                    break;
+                case BLACK:
+                    return false;
+                    break;
+                }
+        }
+        return true;
     }
 
     /*
@@ -55,8 +81,12 @@ public:
      * Node::_color:
      *          WHITE       untouched
      *          BLACK       stacked or queued
+     *
+     * CAVEAT:
+     *      This function assumes and does not check that the graph is acyclic.
+     *      You need to call verify_dag() to verify that
      */
-    std::string breadth_first_traverse(const std::function<std::string (const Node*)> &fn)
+    std::string breadth_first_traverse(const std::function<std::string (const Node*)> &fn) const
     {
         std::string out;
 
@@ -66,6 +96,7 @@ public:
         while(!s.empty()) {
             const Node *curr = s.front();
             s.pop();
+            //printf("%c\n", curr->_val);
             out += fn(curr);
             //curr->_color = BLACK;
             for (auto p: curr->_child_list)
@@ -75,12 +106,12 @@ public:
                 }
         }
 
-        this->bleach();
+        this->_bleach();
 
         return out;
     }
 
-    std::string depth_first_traverse(const std::function<std::string(const Node*)> &fn)
+    std::string depth_first_traverse(const std::function<std::string(const Node*)> &fn) const
     {
         std::string out;
 
@@ -99,7 +130,7 @@ public:
                 }
         }
 
-        this->bleach();
+        this->_bleach();
 
         return out;
     }
@@ -132,10 +163,23 @@ public:
 
 private:
     val_t _val = 0;
-    enum { WHITE, BLACK } _color = WHITE;
     bool _is_eow = false;
     std::vector<Node*> _parent_list;
     std::vector<Node*> _child_list;
+
+    mutable enum { WHITE, GREY, BLACK } _color = WHITE;
+
+    /*
+     * Set _color of all nodes to WHITE
+     *
+     * Pre-order, recursive implementation
+     */
+    void _bleach() const
+    {
+        _color = WHITE;
+        for (const auto p: _child_list)
+            p->_bleach();
+    }
 }; /* class Dag::Node */
 
 Dag::~Dag()
@@ -200,7 +244,6 @@ std::string Dag::export_louds(const std::string &sep) const
 std::string Dag::export_data() const
 {
     // Sort the child list by alphabetical order
-    //std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
         const size_t len = 200;
         char buf[len];
@@ -215,43 +258,28 @@ std::string Dag::export_data() const
     return tmp;
 }
 
-std::string Dag::export_ascii_debug() const
-{
-    // Sort the child list by alphabetical order
-    std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
-        const size_t len = 256;
-        size_t offset = 0;
-        char buf[len];
-
-        offset += snprintf(buf + offset, len, "%X", p->_val);
-        offset += snprintf(buf + offset, len, "\t");
-        const size_t num_child = p->_child_list.size();
-        for (size_t i = 0; i < num_child; i++)
-            offset += snprintf(buf + offset, len, "1");
-        offset += snprintf(buf + offset, len, "0");
-        offset += snprintf(buf + offset, len, "\n");
-
-        return std::string(buf);
-    });
-    tmp.pop_back();
-    return tmp;
-}
-
 std::vector<std::string> Dag::export_sorted_wordlist_debug() const
 {
     std::vector<std::string> out;
 
-    std::stack<const Node*> s;
-    s.push(this->_root);
+    std::string buf;
+    buf.resize(BUFSIZ);
+
+    std::stack<std::pair<const Node*, size_t>> s;
+    s.push({this->_root, 0});
+    buf[0] = _root->_val;
+    _root->_color = Node::BLACK;
     while(!s.empty()) {
-        const Node *curr = s.top();
+        const std::pair<const Node*, size_t> curr = s.top();
         s.pop();
-        for (const auto p: curr->_child_list)
-            s.push(p);
-        if (curr->is_eow()) {
-            std::string word;
-            for (const Node *p = curr; p->_parent; p = p->_parent)
-                word.insert(0, 1, static_cast<const char>(p->_val));
+        buf[curr.second - 1] = curr.first->_val;
+        for (const auto p: curr.first->_child_list)
+            if (p->_color == Node::WHITE) {
+                s.push({p, curr.second + 1});
+                p->_color = Node::BLACK;
+            }
+        if (curr.first->is_eow()) {
+            std::string word(buf.data(), curr.second);
             //fprintf(stderr,"%s\n", word.c_str());
             out.push_back(std::move(word));
         }

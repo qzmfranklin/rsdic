@@ -1,21 +1,26 @@
 #include "src/rsdic/Rsdic.h"
 #include "src/rsdic/RsdicBuilder.h"
 #include "src/rx/rx.h"
-#include "Tree.h"
+#include "Dag.h"
 #include <gtest/gtest.h>
 
 #include <fstream>
 #include <stdio.h>
 
-TEST(Tree, input) {
-    const char fname[] = "test_data/highlights/el-GR.txt";
+TEST(Dag, input) {
+    const char fname[] = "test_data/highlights_wordlist.txt";
+    //const char fname[] = "test_data/small_ascii.txt";
+    //const char fname[] = "test_data/large_ascii.txt";
+    //const char fname[] = "test_data/large_utf8.txt";
+    //const char fname[] = "test_data/full_english.txt";
+    //const char fname[] = "test_data/huge_utf8.txt";
     FILE *fp = fopen(fname, "r");
     if (!fp) {
         fprintf(stderr,"Cannot open file: %s\n", fname);
         exit(1);
     }
 
-    Tree g;
+    Dag g;
     std::vector<std::string> wordlist0;
     { // Add words from the word list to the dawg
         g.make_root();
