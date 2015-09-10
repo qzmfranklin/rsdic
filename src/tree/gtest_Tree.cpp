@@ -8,7 +8,8 @@
 #include <stdio.h>
 
 TEST(Tree, input) {
-    const char fname[] = "test_data/small_ascii.txt";
+    const char fname[] = "test_data/highlights_wordlist.txt";
+    //const char fname[] = "test_data/small_ascii.txt";
     //const char fname[] = "test_data/large_ascii.txt";
     //const char fname[] = "test_data/large_utf8.txt";
     //const char fname[] = "test_data/full_english.txt";
@@ -61,7 +62,7 @@ TEST(Tree, input) {
         std::string data  = g.export_data();
         std::string louds = g.export_louds();
         //printf("data\n%s\n", data.c_str());
-        printf("louds\n%s\n", louds.c_str());
+        //printf("louds\n%s\n", louds.c_str());
 
         { // Build bit vector
             rsdic::RsdicBuilder builder;
