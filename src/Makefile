@@ -17,7 +17,7 @@ test: $(TESTS)
 	$(QUIET)for t in $^ ; do ./"$$t" ; done
 
 gtest_builder.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_builder.o \
-	$(ROOT)/src/graph/tree/Tree.o \
+	$(ROOT)/src/builder/tree/Tree.o \
 	$(ROOT)/src/succinct/rsdic/RsdicBuilder.o $(ROOT)/src/succinct/rsdic/Rsdic.o \
 	$(ROOT)/src/succinct/rsdic/EnumCoder.o $(ROOT)/src/succinct/rx/rx.o \
 	$(ROOT)/src/os/path.o

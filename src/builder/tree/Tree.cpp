@@ -6,7 +6,7 @@
 
 #include <assert.h>
 
-namespace graph {
+namespace builder {
 
 class Tree::Node {
 public:
@@ -229,4 +229,4 @@ std::vector<std::string> Tree::export_sorted_wordlist_debug() const
     return out;
 }
 
-} /* namespace graph */
+} /* namespace builder */

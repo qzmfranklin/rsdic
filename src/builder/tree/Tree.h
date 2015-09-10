@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace graph {
+namespace builder {
 
 /*
  * Running example of usage in gtest_Tree.cpp
@@ -54,6 +54,6 @@ private:
     std::vector<std::string> _wordlist;
 };
 
-} /* namespace graph */
+} /* namespace builder */
 
 #endif /* end of include guard __Tree__h__ */
