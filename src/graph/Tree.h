@@ -5,9 +5,35 @@
 #include <vector>
 
 /*
- * This is a playground class for testing the Dag class. I believe that I had
- * enough experience to move on to the more complicated Dag class now that I
- * have finished the Tree class.
+ * Running example of usage in gtest_Tree.cpp
+ * Brief example of usage:
+ *
+ *      Tree g;
+ *      g.make_root();
+ *      for_each(const std::string &&keyword)
+ *          g.add_word(keyword);
+ *
+ *      // The LOUDS is exported as a binary string, i.e.:
+ *      //          "01000111..."
+ *      g.export_louds("\n");
+ *
+ *      // The actual data associated with each node in LOUDS
+ *      //          54\n
+ *      //          AF\tEOW\n
+ *      //          59\n
+ *      //          5A\n
+ *      //          A9\tEOW\n
+ *      g.export_data();
+ *
+ * Rationale:
+ *      Some people may find this string based interface annoying
+ *
+ *      Well, it has its own advantages:
+ *          1.  Minimal dependency, easy to drop into your own projects
+ *          2.  Easy to debug because outputs are human readable strings
+ *          3.  Good compatibility because outputs are made ASCII
+ *          4.  Easy to parse the TSV output
+ *          5.  Traditional *nix tools apply
  */
 class Tree {
 public:

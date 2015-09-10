@@ -115,6 +115,7 @@ void Tree::make_root()
 void Tree::add_word(const std::string &&word)
 {
     //fprintf(stderr,"    %s\n", word.c_str());
+    assert(this->_root);
 
     // Find the first unmatched node
     Node *curr = _root;
@@ -145,7 +146,7 @@ void Tree::add_word(const std::string &&word)
 
 std::string Tree::export_louds(const std::string &sep) const
 {
-    // Sort the child list by alphabetical order
+    assert(this->_root);
     return _root->breadth_first_traverse([&sep] (const Node *p) -> std::string {
         const size_t len = 200;
         size_t offset = 0;
@@ -162,8 +163,7 @@ std::string Tree::export_louds(const std::string &sep) const
 
 std::string Tree::export_data() const
 {
-    // Sort the child list by alphabetical order
-    //std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
+    assert(this->_root);
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
         const size_t len = 200;
         char buf[len];
@@ -180,7 +180,7 @@ std::string Tree::export_data() const
 
 std::string Tree::export_ascii_debug() const
 {
-    // Sort the child list by alphabetical order
+    assert(this->_root);
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
         const size_t len = 256;
         size_t offset = 0;
