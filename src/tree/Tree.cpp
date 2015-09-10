@@ -169,6 +169,7 @@ std::string Tree::export_louds(const std::string &sep) const
 std::string Tree::export_data() const
 {
     // Sort the child list by alphabetical order
+    //std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
     std::string tmp = _root->breadth_first_traverse([] (const Node *p) -> std::string {
         const size_t len = 200;
         char buf[len];

@@ -3,13 +3,16 @@
 #include "src/rx/rx.h"
 #include "Tree.h"
 #include <gtest/gtest.h>
+
+#include <fstream>
 #include <stdio.h>
 
 TEST(Tree, input) {
-    //const char fname[] = "test_data/small_ascii.txt";
+    const char fname[] = "test_data/small_ascii.txt";
     //const char fname[] = "test_data/large_ascii.txt";
-    const char fname[] = "test_data/large_utf8.txt";
+    //const char fname[] = "test_data/large_utf8.txt";
     //const char fname[] = "test_data/full_english.txt";
+    //const char fname[] = "test_data/huge_utf8.txt";
     FILE *fp = fopen(fname, "r");
     if (!fp) {
         fprintf(stderr,"Cannot open file: %s\n", fname);
@@ -50,17 +53,21 @@ TEST(Tree, input) {
 
     rsdic::Rsdic v;
     struct rbx *rbx = nullptr;
+    const char *ofname = "OUTPUT/dict.dat";
+    std::ofstream os;
+    os.open(ofname, std::ios_base::out);
     { // Build bit vector and rbx data
         //std::string tmp = g.export_ascii_debug();
         std::string data  = g.export_data();
         std::string louds = g.export_louds();
         //printf("data\n%s\n", data.c_str());
-        //printf("louds\n%s\n", louds.c_str());
+        printf("louds\n%s\n", louds.c_str());
 
         { // Build bit vector
             rsdic::RsdicBuilder builder;
             builder.add_string(louds);
             v = builder.build();
+            v.save(os);
             printf("bitvec size = %llu\n", v.get_usage_bytes());
         }
 
@@ -82,6 +89,7 @@ TEST(Tree, input) {
             { // Add blobs from the word list
                 std::stringstream ss(data);
                 std::string line;
+                size_t rbx_useful = 0;
                 while ( std::getline(ss, line, '\n') ) {
                     //printf("%s\n", line.c_str());
                     int ch;
@@ -98,23 +106,31 @@ TEST(Tree, input) {
                         snprintf(tmp, 256, "%X%s", buf[0], buf[1] == 0x01 ? "\tEOW" : "");
                         ASSERT_EQ(std::string(tmp), line);
                     }
-                    //printf("%X %X\n", buf[0], buf[1]);
+                    //printf("%2zu %X %X\n", len, buf[0], buf[1]);
                     rbx_builder_push(builder, buf, len);
+                    rbx_useful += len;
                 }
+                printf("rbx_useful  = %zu\n", rbx_useful);
             }
 
-            rbx_builder_build(builder);
+            {
+                rbx_builder_build(builder);
 
-            const unsigned char *buf = rbx_builder_get_image(builder);
-            const int size = rbx_builder_get_size(builder);
-            unsigned char *data = (unsigned char*) malloc(size);
-            assert(data);
-            memcpy(data, buf, size);
-            rbx = rbx_open(data);
+                const unsigned char *buf = rbx_builder_get_image(builder);
+                const int size = rbx_builder_get_size(builder);
+                unsigned char *data = (unsigned char*) malloc(size);
+                os.write((const char*)data, size);
+                assert(data);
+                memcpy(data, buf, size);
+                rbx = rbx_open(data);
 
-            printf("data = %p, size = %d\n", data, size);
+                printf("rbx size    = %d\n", size);
+                printf("total size  = %llu\n", size + v.get_usage_bytes());
 
-            rbx_builder_release(builder);
+                rbx_builder_release(builder);
+            }
         }
     }
+
+    rbx_close(rbx);
 }
