@@ -1,6 +1,6 @@
-#include "src/rsdic/Rsdic.h"
-#include "src/rsdic/RsdicBuilder.h"
-#include "src/rx/rx.h"
+#include "src/succinct/rsdic/Rsdic.h"
+#include "src/succinct/rsdic/RsdicBuilder.h"
+#include "src/succinct/rx/rx.h"
 #include "Tree.h"
 #include <gtest/gtest.h>
 

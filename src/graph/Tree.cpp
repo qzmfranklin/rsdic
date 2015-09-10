@@ -4,6 +4,8 @@
 #include <queue>
 #include <stack>
 
+#include <assert.h>
+
 class Tree::Node {
 public:
     typedef char val_t; // value type

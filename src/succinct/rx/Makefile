@@ -1,4 +1,4 @@
-ROOT    :=$(realpath ../..)
+ROOT    :=$(realpath ../../..)
 D	:=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 -include $(ROOT)/root.mk
 -include $(ROOT)/gtest/rules.mk
