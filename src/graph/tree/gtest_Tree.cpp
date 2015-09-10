@@ -1,11 +1,6 @@
-#include "src/os/path.h"
-#include "src/succinct/rsdic/Rsdic.h"
-#include "src/succinct/rsdic/RsdicBuilder.h"
-#include "src/succinct/rx/rx.h"
 #include "Tree.h"
+#include "src/os/path.h"
 #include <gtest/gtest.h>
-
-#include <fstream>
 #include <stdio.h>
 
 TEST(Tree, input) {
@@ -50,87 +45,11 @@ TEST(Tree, input) {
             EXPECT_EQ(wordlist0[i], wordlist1[i]);
     }
 
-
-    rsdic::Rsdic v;
-    struct rbx *rbx = nullptr;
-    //const char *ofname = "OUTPUT/dict.dat";
-    //std::ofstream os;
-    //os.open(ofname, std::ios_base::out);
-    { // Build bit vector and rbx data
-        //std::string tmp = g.export_ascii_debug();
+    {
         std::string data  = g.export_data();
         std::string louds = g.export_louds();
+        printf("Use export_data(0 and export_louds() to export the tree data\n");
         //printf("data\n%s\n", data.c_str());
         //printf("louds\n%s\n", louds.c_str());
-
-        { // Build bit vector
-            rsdic::RsdicBuilder builder;
-            builder.add_string(louds);
-            v = builder.build();
-            //v.save(os);
-            printf("bitvec size = %llu\n", v.get_usage_bytes());
-        }
-
-        { // Build rbx
-            struct rbx_builder *builder = rbx_builder_create();
-
-            {
-                /*
-                 * Coding parameters: a, b
-                 *        a + b * n
-                 * No idea what they really are. But trying a=1-4 for the best
-                 * value, i.e., smallest image size
-                 */
-                const int a = 1;
-                const int b = 1;
-                rbx_builder_set_length_coding(builder, a, b);
-            }
-
-            { // Add blobs from the word list
-                std::stringstream ss(data);
-                std::string line;
-                size_t rbx_useful = 0;
-                while ( std::getline(ss, line, '\n') ) {
-                    //printf("%s\n", line.c_str());
-                    int ch;
-                    sscanf(line.data(), "%X", &ch);
-                    char buf[2] = "\0";
-                    buf[0] = (char)ch;
-                    size_t len = 1;
-                    if (line.find("EOW") != std::string::npos) {
-                        buf[1] = 0x01;
-                        len = 2;
-                    }
-                    { // Check: can reconstruct the original line
-                        char tmp[256];
-                        snprintf(tmp, 256, "%X%s", buf[0], buf[1] == 0x01 ? "\tEOW" : "");
-                        ASSERT_EQ(std::string(tmp), line);
-                    }
-                    //printf("%2zu %X %X\n", len, buf[0], buf[1]);
-                    rbx_builder_push(builder, buf, len);
-                    rbx_useful += len;
-                }
-                printf("rbx_useful  = %zu\n", rbx_useful);
-            }
-
-            {
-                rbx_builder_build(builder);
-
-                const unsigned char *buf = rbx_builder_get_image(builder);
-                const int size = rbx_builder_get_size(builder);
-                unsigned char *data = (unsigned char*) malloc(size);
-                //os.write((const char*)data, size);
-                assert(data);
-                memcpy(data, buf, size);
-                rbx = rbx_open(data);
-
-                printf("rbx size    = %d\n", size);
-                printf("total size  = %llu\n", size + v.get_usage_bytes());
-
-                rbx_builder_release(builder);
-            }
-        }
     }
-
-    rbx_close(rbx);
 }

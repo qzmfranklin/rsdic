@@ -1,13 +1,12 @@
-ROOT    :=$(realpath ../../..)
+ROOT    :=$(realpath ..)
 D       :=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))# this directory
 -include $(ROOT)/root.mk
 -include $(ROOT)/gtest/rules.mk
--include $(ROOT)/src/os/rules.mk
 -include $(D)/rules.mk
 # Inlcude more rules.mk here if you this directory depends on them.
 -include $(DEP)
 
-TESTS:=gtest_Tree.exe
+TESTS:=gtest_builder.exe
 
 .PHONY: all asm clean test
 all: $(OBJ)
@@ -17,5 +16,8 @@ clean:
 test: $(TESTS)
 	$(QUIET)for t in $^ ; do ./"$$t" ; done
 
-gtest_Tree.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_Tree.o $(D)/Tree.o \
+gtest_builder.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_builder.o \
+	$(ROOT)/src/graph/tree/Tree.o \
+	$(ROOT)/src/succinct/rsdic/RsdicBuilder.o $(ROOT)/src/succinct/rsdic/Rsdic.o \
+	$(ROOT)/src/succinct/rsdic/EnumCoder.o $(ROOT)/src/succinct/rx/rx.o \
 	$(ROOT)/src/os/path.o
