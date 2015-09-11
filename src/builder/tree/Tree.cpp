@@ -127,7 +127,7 @@ void Tree::add_word(const std::string &&word)
     //fprintf(stderr,"1\n");
 
     for (i = 0; i < word.size(); i++) {
-        //fprintf(stderr,"%c\n", word[i]);
+        //fprintf(stderr,"%02X\n", static_cast<const uint8_t>(word[i]));
         Node *next = curr->find_child(static_cast<Node::val_t>(word[i]));
         if (next)
             curr = next;
@@ -172,7 +172,7 @@ std::string Tree::export_data() const
         const size_t len = 200;
         char buf[len];
         size_t  offset = 0;
-        offset += snprintf(buf + offset, len, "%X", p->_val);
+        offset += snprintf(buf + offset, len, "%02X", static_cast<const uint8_t>(p->_val));
         if (p->is_eow())
             offset += snprintf(buf + offset, len, "\tEOW");
         offset += snprintf(buf + offset, len, "\n");
@@ -190,7 +190,7 @@ std::string Tree::export_ascii_debug() const
         size_t offset = 0;
         char buf[len];
 
-        offset += snprintf(buf + offset, len, "%X", p->_val);
+        offset += snprintf(buf + offset, len, "%X", static_cast<const uint8_t>(p->_val));
         offset += snprintf(buf + offset, len, "\t");
         const size_t num_child = p->_child_list.size();
         for (size_t i = 0; i < num_child; i++)

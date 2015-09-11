@@ -48,7 +48,7 @@ TEST(Tree, input) {
     {
         std::string data  = g.export_data();
         std::string louds = g.export_louds();
-        printf("Use export_data(0 and export_louds() to export the tree data\n");
+        printf("Use export_data() and export_louds() to export the tree data\n");
         //printf("data\n%s\n", data.c_str());
         //printf("louds\n%s\n", louds.c_str());
     }
