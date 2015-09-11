@@ -24,6 +24,8 @@
 #include "Rsdic.h"
 #include "EnumCoder.h"
 
+#include <fstream>
+
 TEST(BitVec, combination)
 {
     for (uint64_t i = 0; i <= 64; ++i) {
@@ -150,6 +152,58 @@ TEST(Rsdic, large)
     uint64_t one_num = v.one_num();
     for (uint64_t i = 0; i < one_num; i++)
         EXPECT_EQ(poses[i], v.select1(i + 1));
+}
+
+TEST(Rsdic, CStyleLoad)
+{
+    const char *fname = "/tmp/haha";
+
+    std::vector<uint64_t> poses;
+
+    { // build and save
+        rsdic::RsdicBuilder g;
+        const uint64_t n = 16llu * 1024llu * 1024llu; // 4MB
+        for (uint64_t i = 0; i < n; i++) {
+            float r = (float)rand() / RAND_MAX;
+            if (r < 0.5) {
+                g.push_back(1);
+                poses.push_back(i);
+            } else g.push_back(0);
+        }
+        const rsdic::Rsdic v = g.build();
+
+        std::ofstream os(fname);
+        v.save(os);
+    }
+
+    { // load with stream and test
+        rsdic::Rsdic v;
+        std::ifstream is(fname);
+        // This is what I want to test!
+        v.load(is);
+        uint64_t one_num = v.one_num();
+        for (uint64_t i = 0; i < one_num; i++)
+            EXPECT_EQ(poses[i], v.select1(i + 1));
+    }
+
+    { // load with C-style functions and test
+        struct stat st;
+        if (::stat(fname, &st) != 0)
+            fprintf(stderr, "Cannot determine size of %s: %s\n", fname, ::strerror(errno));
+        const size_t len = st.st_size;
+
+        FILE *fp = fopen(fname, "r");
+        char *buf = (char *)malloc(len);
+        fread(buf, 1, len, fp);
+        fclose(fp);
+
+        rsdic::Rsdic v;
+        // This is what I want to test!
+        v.load(buf, len);
+        uint64_t one_num = v.one_num();
+        for (uint64_t i = 0; i < one_num; i++)
+            EXPECT_EQ(poses[i], v.select1(i + 1));
+    }
 }
 
 TEST(Rsdic, InitFromString)
