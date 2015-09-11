@@ -16,7 +16,16 @@ public:
     Node(const val_t val): _val(val) {}
 
     void set_eow() { _is_eow = true; }
-    const bool is_eow() const { return _is_eow; }
+    bool is_eow() const { return _is_eow; }
+
+    bool is_last_child() const
+    {
+        if (!_parent)
+            return true;
+        assert(!_parent->empty());
+        assert(_parent->back());
+        return this == _parent->_child_list.back();
+    }
 
     void add_child(Node *p)
     {
@@ -173,8 +182,10 @@ std::string Tree::export_data() const
         char buf[len];
         size_t  offset = 0;
         offset += snprintf(buf + offset, len, "%02X", static_cast<const uint8_t>(p->_val));
+        if (p->is_last_child())
+            offset += snprintf(buf + offset, len, "\tLAST_CHILD");
         if (p->is_eow())
-            offset += snprintf(buf + offset, len, "\tEOW");
+            offset += snprintf(buf + offset, len, "\tEND_OF_WORD");
         offset += snprintf(buf + offset, len, "\n");
         return std::string(buf);
     });

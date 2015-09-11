@@ -95,15 +95,19 @@ TEST(Tree, input) {
                     int ch;
                     sscanf(line.data(), "%X", &ch);
                     char buf[2] = "\0";
-                    buf[0] = (char)ch;
-                    size_t len = 1;
-                    if (line.find("EOW") != std::string::npos) {
-                        buf[1] = 0x01;
-                        len = 2;
-                    }
+                    buf[0] = (uint8_t)ch;
+                    if (line.find("LAST_CHILD") != std::string::npos)
+                        buf[1] |= 0x01;
+                    if (line.find("END_OF_WORD") != std::string::npos)
+                        buf[1] |= 0x01 << 1;
+                    const size_t len = buf[1] ? 2 : 1;
                     { // Check: can reconstruct the original line
                         char tmp[256];
-                        snprintf(tmp, 256, "%X%s", buf[0], buf[1] == 0x01 ? "\tEOW" : "");
+                        snprintf(tmp, 256, "%02X%s%s"
+                                , (uint8_t)buf[0]
+                                , buf[1] & 0x01 ? "\tLAST_CHILD" : ""
+                                , buf[1] & 0x01 << 1 ? "\tEND_OF_WORD" : ""
+                                );
                         ASSERT_EQ(std::string(tmp), line);
                     }
                     //printf("%2zu %X %X\n", len, buf[0], buf[1]);
