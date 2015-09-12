@@ -236,9 +236,11 @@ TEST(Rsdic, InitFromString)
     //      v[m] = 1:
     //          child(m)  = select0(rank1(m)) + 1
     //          parent(m) = select1(rank0(m))
+    //          next(m)   = select0(rank0(m) + 1) + 1
     //      v[m] = 0:
     //          no child node
     //          parent(m) = select1(rank0(m) - 1)
+    //          next(m)   = select0(rank0(m)) + 1
     rsdic::RsdicBuilder g;
     g.add_string(str);
     const rsdic::Rsdic v = g.build();

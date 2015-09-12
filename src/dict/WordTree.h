@@ -44,11 +44,11 @@ public:
      *
      * Implementation of functions are documented in the cpp file.
      */
-    typedef uint32_t WordTree::index_t;
+    typedef uint32_t index_t;
+    typedef uint32_t rbx_index_t;
 
-    WordTree(const void *ptr, const size_t len);
-
-    bool good() const { return _state == READY; }
+    WordTree(const char *ptr, const size_t len);
+    ~WordTree();
 
     /*
      * Test that a node
@@ -59,22 +59,15 @@ public:
     bool is_eow(const index_t) const;
 
     /*
-     * Return the first bit of the last node of the given string.
-     * Return 0 if the string is not found.
-     *
-     * This function is very slow. It is mainly used for debugging purposes.
-     * Please do NOT use this function in performance critical code regions.
-     */
-    index_t find(const std::string&) const;
-
-    /*
      * Return the UTF8 code unit associated with the node.
      */
-    char utf8unit(const index_t) const;
+    char get_data(const index_t) const;
 
     /*
      * Return the first bit of the parent, if any.
      * Return 0 otherwise.
+     *
+     * CAVEAT: Do not call this function with index_t 0, i.e., the super root.
      */
     index_t parent(const index_t) const;
 
@@ -89,29 +82,62 @@ public:
     index_t child(const index_t) const;
 
     /*
-     * Get the next node in a depth first traversal.
-     *
-     * Return 0 if:
-     *      This node is already a last child, as verified by is_last_child().
-     *
-     * If this node has the next sibling node, the return value is the same as
-     * next_sibling().
+     * select0(rank0(off) + 1) - off
+     * Abort if current bit is 0
+     * Can lead to unexpected behavior if out of range
      */
-    index_t next(const index_t) const;
+    size_t child_count(const index_t) const;
 
     /*
-     * Get the next sibling node, if any.
-     *
-     * Return 0 if:
-     *      This node is already a last child, as verified by is_last_child().
+     * Count get_bit(off) until the next 0
      */
-    index_t next_sibling(const index_t) const;
-private:
-    enum { EMPTY, READY } _state = EMPTY;
+    size_t child_count_iterative(const index_t) const;
 
+    /*
+     * select0(rank0(off) + 1) + 1
+     * Unsafe if current bit
+     *      1.  is 0, or
+     *      2.  is already the last child of its parent, or
+     *      3.  is the last bit in the bit vector (for LOUDS, this is implied by 2)
+     */
+    index_t next_unsafe(const index_t) const;
+
+    /*
+     * Add proper checking to next_sibling_unsafe().
+     * Return 0 if any such checking fails.
+     */
+    //index_t next_sibling_safe(const index_t) const;
+
+    /*
+     * select0(rank0(off) + 1)
+     * Subject to the same unsafeness as next_sibling_unsafe().
+     *
+     * This function can be very useful fora
+     */
+    //index_t last_bit_unsafe(const index_t) const;
+
+    /*
+     * Return the first bit of the last node of the given string.
+     * Return 0 if the string is not found.
+     *
+     * This function is very slow. It is mainly used for debugging purposes.
+     * Please do NOT use this function in performance critical code regions.
+     */
+    index_t find(const std::string&) const;
+
+private:
     std::shared_ptr<rsdic::Rsdic> _louds = nullptr;
-    size_t _rbx_max_index = 0;
-    struct *rbx = nullptr;
+    uint32_t _rbx_max_index = 0;
+    struct rbx *_rbx = nullptr;
+
+    enum BitMask: uint8_t {
+        LastChild = 0x1,
+        EndOfWord = 0x1 << 1
+    };
+
+    rbx_index_t _get_rbx_index(const index_t) const;
+    uint8_t _get_data_byte(const rbx_index_t) const;
+    uint8_t _get_flag_byte(const rbx_index_t) const;
 };
 
 } /* namespace dict */
