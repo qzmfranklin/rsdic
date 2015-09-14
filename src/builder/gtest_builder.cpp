@@ -127,10 +127,10 @@ TEST(Tree, input) {
                 const unsigned char *buf = rbx_builder_get_image(builder);
                 const int size = rbx_builder_get_size(builder);
                 unsigned char *data = (unsigned char*) malloc(size);
-                os.write((const char*)&rbx_size, sizeof(rbx_size));
-                os.write((const char*)data, size);
                 assert(data);
                 memcpy(data, buf, size);
+                os.write((const char*)&rbx_size, sizeof(rbx_size));
+                os.write((const char*)data, size);
                 rbx = rbx_open(data);
 
                 printf("rbx size    = %d\n", size);
