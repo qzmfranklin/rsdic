@@ -69,8 +69,11 @@ TEST(Tree, input) {
             rsdic::RsdicBuilder builder;
             builder.add_string(louds);
             v = builder.build();
+            const auto start = os.tellp();
             v.save(os);
-            printf("bitvec size = %llu\n", v.get_usage_bytes());
+            v.print();
+            //printf("bitvec size = %llu\n", v.get_usage_bytes());
+            printf("rbx starts from offset = %lld\n", os.tellp() - start);
         }
 
         { // Build rbx
