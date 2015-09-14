@@ -25,7 +25,7 @@ ssize_t getsize(const std::string&);
 // TODO: The following three functions are not implemented yet.
 //bool isfile(const std::string&);
 //bool isdir(const std::string&);
-//bool exists(const std::string&);
+bool exists(const std::string&);
 
 
 } /* namespace path */

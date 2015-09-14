@@ -136,7 +136,12 @@ ssize_t getsize(const std::string &path)
 
 bool isfile(const std::string&);
 bool isdir(const std::string&);
-bool exists(const std::string&);
+
+bool exists(const std::string &path)
+{
+    struct stat st;
+    return ::stat(path.c_str(), &st) == 0;
+}
 
 
 } /* namespace path */

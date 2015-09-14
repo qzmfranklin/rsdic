@@ -114,3 +114,22 @@ TEST(path, expanduser) {
     for (size_t i = 0; i < num; i++)
         EXPECT_EQ(os::path::expanduser(w0[i]), w1[i]);
 }
+
+TEST(path, exists) {
+    printf("This test may fail if you are not on Darwin system.\n");
+    const std::vector<std::string> w0 = {
+        "/usr/bin/python3",
+        "/bin/sh",
+        "/etc/",
+    };
+    for (const auto w: w0)
+        EXPECT_TRUE(os::path::exists(w));
+
+    const std::vector<std::string> w1 = {
+        "/usr/bin/python3333",
+        "/bin/shhhhh",
+        "/etccccc/",
+    };
+    for (const auto w: w1)
+        EXPECT_FALSE(os::path::exists(w));
+}
