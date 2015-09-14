@@ -1,5 +1,6 @@
 #include "src/builder/tree/Tree.h"
 #include "src/os/path.h"
+#include "src/os/os.h"
 #include "src/succinct/rsdic/Rsdic.h"
 #include "src/succinct/rsdic/RsdicBuilder.h"
 #include "src/succinct/rx/rx.h"
@@ -9,9 +10,9 @@
 #include <stdio.h>
 
 TEST(Tree, input) {
-    std::string fname = os::path::realpath(os::path::join({
-                os::path::dirname(__FILE__),
-                "../test_data/highlights/el-GR.txt"
+    const std::string this_dir = os::path::realpath(os::path::dirname(__FILE__));
+    std::string fname = os::path::normpath(os::path::join({
+                this_dir, "../test_data/highlights/el-GR.txt"
             }));
     FILE *fp = fopen(fname.c_str(), "r");
     if (!fp) {
@@ -53,9 +54,10 @@ TEST(Tree, input) {
 
     rsdic::Rsdic v;
     struct rbx *rbx = nullptr;
-    //const char *ofname = "OUTPUT/dict.dat";
-    //std::ofstream os;
-    //os.open(ofname, std::ios_base::out);
+    const std::string ofname = os::path::join({this_dir, "OUTPUT", "dict.dat"});
+    os::mkdir(os::path::join({this_dir, "OUTPUT"}));
+    std::ofstream os;
+    os.open(ofname, std::ios_base::out);
     { // Build bit vector and rbx data
         //std::string tmp = g.export_ascii_debug();
         std::string data  = g.export_data();
@@ -67,7 +69,7 @@ TEST(Tree, input) {
             rsdic::RsdicBuilder builder;
             builder.add_string(louds);
             v = builder.build();
-            //v.save(os);
+            v.save(os);
             printf("bitvec size = %llu\n", v.get_usage_bytes());
         }
 
@@ -123,7 +125,7 @@ TEST(Tree, input) {
                 const unsigned char *buf = rbx_builder_get_image(builder);
                 const int size = rbx_builder_get_size(builder);
                 unsigned char *data = (unsigned char*) malloc(size);
-                //os.write((const char*)data, size);
+                os.write((const char*)data, size);
                 assert(data);
                 memcpy(data, buf, size);
                 rbx = rbx_open(data);
