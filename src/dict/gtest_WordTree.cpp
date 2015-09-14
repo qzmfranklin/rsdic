@@ -1,9 +1,10 @@
 #include "WordTree.h"
 #include "src/os/path.h"
 #include "src/os/os.h"
+
 #include <gtest/gtest.h>
 
-#include <fcntl.h>
+#include <stdio.h>
 
 TEST(WordTree, test) {
     const std::string this_dir = os::path::realpath(os::path::dirname(__FILE__));
@@ -16,7 +17,7 @@ TEST(WordTree, test) {
 
         ASSERT_TRUE(os::path::exists(image_fname));
         len = os::path::getsize(image_fname);
-        printf("filesize = %zu\n", len);
+        //printf("filesize = %zu\n", len);
 
         FILE *fp = fopen(image_fname.c_str(), "r");
         if (!fp) {
@@ -33,8 +34,6 @@ TEST(WordTree, test) {
         }
         fclose(fp);
     }
-    //for(int i = 0; i < len; i++)
-        //printf("%02X ", (uint8_t)buf[0]);
 
     dict::WordTree g(buf, len);
 

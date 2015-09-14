@@ -14,15 +14,15 @@ static uint32_t read_4bytes(const void *buf) {
     return (tmp0 << 24u) | (tmp1 << 16u) | (tmp2 << 8u) | tmp3;
 }
 
-WordTree::WordTree(const char *ptr, const size_t len)
+WordTree::WordTree(const char *ptr, const size_t len):
+    _louds(std::make_shared<rsdic::Rsdic>())
 {
     /*
      * _louds->load() copies the data.
      * rbx_open() allocates additional memory but does not copy the original
      * data (TODO: need to verify this)
      */
-    _louds->load(ptr, len);
-    const size_t offset = _louds->get_usage_bytes();
+    const size_t offset = _louds->load(ptr, len);
     _rbx_max_index = read_4bytes(ptr + offset);
     _rbx = rbx_open((const unsigned char*)ptr + offset + 4);
 }
@@ -33,7 +33,7 @@ WordTree::~WordTree()
     rbx_close(_rbx);
 }
 
-bool WordTree::is_valid(const index_t off) const
+bool WordTree::is_valid_rbx_index(const rbx_index_t off) const
 {
     return off <= _rbx_max_index;
 }
@@ -78,7 +78,8 @@ size_t WordTree::child_count(const index_t off) const
     bool bit;
     uint64_t rank0;
     _louds->get_bit_and_rank0(off, &bit, &rank0);
-    return is_valid(rank0 + 1) ? _louds->select0(rank0 + 1) - off : 0;
+    rbx_index_t next = rank0 + 1;
+    return is_valid_rbx_index(next) ? _louds->select0(next) - off : 0;
 }
 
 size_t WordTree::child_count_iterative(const index_t off) const
@@ -99,7 +100,7 @@ WordTree::index_t WordTree::find(const std::string&) const
     std::stack<index_t> s;
     s.push(0); // super root
     while(!s.empty()) {
-        const index_t curr = s.top();
+        //const index_t curr = s.top();
         s.pop();
     }
 

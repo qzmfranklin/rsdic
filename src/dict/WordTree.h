@@ -52,10 +52,10 @@ public:
 
     /*
      * Test that a node
-     *      is a valid node
+     *      is a valid rbx index
      *      is an end-of-word node
      */
-    bool is_valid(const index_t) const;
+    bool is_valid_rbx_index(const index_t) const;
     bool is_eow(const index_t) const;
 
     /*

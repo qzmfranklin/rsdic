@@ -176,7 +176,7 @@ uint64_t Rsdic::select0(const uint64_t ind) const
 namespace {
 template <typename T>
 void _save(std::ostream& os, const std::vector<T>& vs) {
-  uint64_t size = vs.size();
+  const uint64_t size = vs.size();
   os.write((const char*)&size, sizeof(size));
   os.write((const char*)&vs[0], sizeof(vs[0]) * size);
 }
@@ -228,8 +228,7 @@ void Rsdic::load(std::istream& is)
 }
 
 // Used for fast loading
-// TODO: Make it cleaner
-void Rsdic::load(const void *buf, const uint64_t len)
+size_t Rsdic::load(const void *buf, const uint64_t len)
 {
     const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
 
@@ -245,19 +244,12 @@ void Rsdic::load(const void *buf, const uint64_t len)
     ptr += _load_cstyle(ptr, _select_one_inds);
     ptr += _load_cstyle(ptr, _select_zero_inds);
     ptr += _load_cstyle(ptr, _rank_small_blocks);
+
+    return ptr - (const uint8_t*)buf;
 }
 
 uint64_t Rsdic::get_usage_bytes() const
 {
-    /*
-    cout << endl
-         << "bits:" << _bits.size() * sizeof(_bits[0]) << endl
-         << " ptb:" << _pointer_blocks.size() * sizeof(_pointer_blocks[0]) << endl
-         << "  rb:" << _rank_blocks.size() * sizeof(_rank_blocks[0]) << endl
-         << " soi:" << _select_one_inds.size() * sizeof(_select_one_inds[0]) << endl
-         << " soz:" <<     _select_zero_inds.size() * sizeof(_select_zero_inds[0]) << endl
-         << " rsb:" <<     _rank_small_blocks.size() * sizeof(_rank_small_blocks[0]) << endl;
-    */
     return
         _bits.size() * sizeof(_bits[0]) +
         _pointer_blocks.size() * sizeof(_pointer_blocks[0]) +
@@ -285,10 +277,18 @@ bool Rsdic::operator == (const Rsdic& bv) const
 
 void Rsdic::print() const
 {
-    fprintf(stdout,"    size      = %llu\n", _num);
-    fprintf(stdout,"    one_num   = %llu\n", _one_num);
-    fprintf(stdout,"    zero_num  = %llu\n", this->zero_num());
-    fprintf(stdout,"    one_ratio = %lf\n", static_cast<double>(_one_num) / _num);
+    fprintf(stdout,"    size        = %llu\n", _num);
+    fprintf(stdout,"    one_num     = %llu\n", _one_num);
+    fprintf(stdout,"    zero_num    = %llu\n", this->zero_num());
+    fprintf(stdout,"    one_ratio   = %lf\n", static_cast<double>(_one_num) / _num);
+
+    fprintf(stdout,"    bits        = %lu\n" , _bits.size() * sizeof(_bits[0]) );
+    fprintf(stdout,"    ptr_blk     = %lu\n" , _pointer_blocks.size() * sizeof(_pointer_blocks[0]) );
+    fprintf(stdout,"    rank_blk    = %lu\n" , _rank_blocks.size() * sizeof(_rank_blocks[0]) );
+    fprintf(stdout,"    sel1ind     = %lu\n" , _select_one_inds.size() * sizeof(_select_one_inds[0]) );
+    fprintf(stdout,"    sel0ind     = %lu\n" , _select_zero_inds.size() * sizeof(_select_zero_inds[0]) );
+    fprintf(stdout," rank_small_blk = %lu\n", _rank_small_blocks.size() * sizeof(_rank_small_blocks[0]) );
+
 }
 
 }

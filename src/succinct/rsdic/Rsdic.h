@@ -51,7 +51,7 @@ public:
   virtual void print() const override;
 
   // Allows us to load the tree quickly
-  void load(const void*, const uint64_t);
+  size_t load(const void*, const uint64_t);
 
   /**
    * This save/load pair are deprecated.
