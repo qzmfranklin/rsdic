@@ -189,6 +189,18 @@ void _load(std::istream& is, std::vector<T>& vs) {
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
 }
 
+template <typename T>
+uint64_t _load_cstyle(const uint8_t *buf, std::vector<T>& vs) {
+    uint64_t bytesread = 0;
+    uint64_t size;
+    memcpy(&size, buf + bytesread, sizeof(size));
+    bytesread += sizeof(size);
+    vs.resize(size);
+    memcpy(&vs[0], buf + bytesread, sizeof(vs[0]) * size);
+    bytesread += sizeof(vs[0]) * size;
+    return bytesread;
+}
+
 } // anonymous namespace
 
 void Rsdic::save(std::ostream& os) const
@@ -227,37 +239,12 @@ void Rsdic::load(const void *buf, const uint64_t len)
     memcpy(&_one_num, ptr, sizeof(_one_num));
     ptr += sizeof(_one_num);
 
-    uint64_t size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_bits.data(), ptr, size * sizeof(_bits[0]));
-    ptr += sizeof(_bits[0]) * size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_pointer_blocks.data(), ptr, size * sizeof(_pointer_blocks[0]));
-    ptr += sizeof(_pointer_blocks[0]) * size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_rank_blocks.data(), ptr, size * sizeof(_rank_blocks[0]));
-    ptr += sizeof(_rank_blocks[0]) * size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_select_one_inds.data(), ptr, size * sizeof(_select_one_inds[0]));
-    ptr += sizeof(_select_one_inds[0]) * size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_select_zero_inds.data(), ptr, size * sizeof(_select_zero_inds[0]));
-    ptr += sizeof(_select_zero_inds[0]) * size;
-
-    memcpy(&size, ptr, sizeof(size));
-    ptr += sizeof(size);
-    memcpy(_rank_small_blocks.data(), ptr, size * sizeof(_rank_small_blocks[0]));
-    ptr += sizeof(_rank_small_blocks[0]) * size;
+    ptr += _load_cstyle(ptr, _bits);
+    ptr += _load_cstyle(ptr, _pointer_blocks);
+    ptr += _load_cstyle(ptr, _rank_blocks);
+    ptr += _load_cstyle(ptr, _select_one_inds);
+    ptr += _load_cstyle(ptr, _select_zero_inds);
+    ptr += _load_cstyle(ptr, _rank_small_blocks);
 }
 
 uint64_t Rsdic::get_usage_bytes() const
