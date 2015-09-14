@@ -88,27 +88,29 @@ TEST(Tree, input) {
                 rbx_builder_set_length_coding(builder, a, b);
             }
 
+            uint32_t rbx_size = 0;
             { // Add blobs from the word list
                 std::stringstream ss(data);
                 std::string line;
                 size_t rbx_useful = 0;
                 while ( std::getline(ss, line, '\n') ) {
+                    rbx_size++;
                     //printf("%s\n", line.c_str());
                     int ch;
                     sscanf(line.data(), "%X", &ch);
                     char buf[2] = "\0";
                     buf[0] = (uint8_t)ch;
-                    if (line.find("LAST_CHILD") != std::string::npos)
-                        buf[1] |= 0x01;
                     if (line.find("END_OF_WORD") != std::string::npos)
+                        buf[1] |= 0x01;
+                    if (line.find("LAST_CHILD") != std::string::npos)
                         buf[1] |= 0x01 << 1;
                     const size_t len = buf[1] ? 2 : 1;
                     { // Check: can reconstruct the original line
                         char tmp[256];
                         snprintf(tmp, 256, "%02X%s%s"
                                 , (uint8_t)buf[0]
-                                , buf[1] & 0x01 ? "\tLAST_CHILD" : ""
-                                , buf[1] & 0x01 << 1 ? "\tEND_OF_WORD" : ""
+                                , buf[1] & 0x01 ? "\tEND_OF_WORD" : ""
+                                , buf[1] & 0x01 << 1 ? "\tLAST_CHILD" : ""
                                 );
                         ASSERT_EQ(std::string(tmp), line);
                     }
@@ -125,6 +127,7 @@ TEST(Tree, input) {
                 const unsigned char *buf = rbx_builder_get_image(builder);
                 const int size = rbx_builder_get_size(builder);
                 unsigned char *data = (unsigned char*) malloc(size);
+                os.write((const char*)&rbx_size, sizeof(rbx_size));
                 os.write((const char*)data, size);
                 assert(data);
                 memcpy(data, buf, size);

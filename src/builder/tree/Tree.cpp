@@ -182,10 +182,10 @@ std::string Tree::export_data() const
         char buf[len];
         size_t  offset = 0;
         offset += snprintf(buf + offset, len, "%02X", static_cast<const uint8_t>(p->_val));
-        if (p->is_last_child())
-            offset += snprintf(buf + offset, len, "\tLAST_CHILD");
         if (p->is_eow())
             offset += snprintf(buf + offset, len, "\tEND_OF_WORD");
+        if (p->is_last_child())
+            offset += snprintf(buf + offset, len, "\tLAST_CHILD");
         offset += snprintf(buf + offset, len, "\n");
         return std::string(buf);
     });
