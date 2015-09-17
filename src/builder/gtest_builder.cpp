@@ -12,7 +12,7 @@
 TEST(Tree, input) {
     const std::string this_dir = os::path::realpath(os::path::dirname(__FILE__));
     std::string fname = os::path::normpath(os::path::join({
-                this_dir, "../test_data/highlights/el-GR.txt"
+                this_dir, "../test_data/highlights/en-US.txt"
             }));
     FILE *fp = fopen(fname.c_str(), "r");
     if (!fp) {
