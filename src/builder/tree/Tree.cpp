@@ -22,8 +22,6 @@ public:
     {
         if (!_parent)
             return true;
-        assert(!_parent->empty());
-        assert(_parent->back());
         return this == _parent->_child_list.back();
     }
 
@@ -39,6 +37,11 @@ public:
             if (p->_val == val)
                 return p;
         return nullptr;
+    }
+
+    void print_debug(const char *action) const
+    {
+        fprintf(stderr,"%s\t%8zu %02X %c\n", action, _index, (uint8_t)_val, _val);
     }
 
     static void sort_child_list(Node *p)
@@ -89,6 +92,20 @@ public:
         return out;
     }
 
+    void breadth_first_numbering()
+    {
+        size_t index = 0;
+        std::queue<Node*> s;
+        s.push(this);
+        while(!s.empty()) {
+            Node *curr = s.front();
+            s.pop();
+            curr->_index = index++;
+            for (auto p: curr->_child_list)
+                s.push(p);
+        }
+    }
+
     /*
      * Release memory starting from this node
      */
@@ -110,6 +127,7 @@ public:
 private:
     val_t _val = 0;
     bool _is_eow = false;
+    size_t _index = 0;
     Node *_parent = nullptr;
     std::vector<Node*> _child_list;
 }; /* class Tree::Node */
@@ -219,13 +237,19 @@ std::vector<std::string> Tree::export_sorted_wordlist_debug() const
 {
     std::vector<std::string> out;
 
+    _root->breadth_first_numbering();
+
     std::stack<const Node*> s;
     s.push(this->_root);
     while(!s.empty()) {
         const Node *curr = s.top();
         s.pop();
-        for (const auto p: curr->_child_list)
+        //fprintf(stderr,"\n");
+        //curr->print_debug("POP");
+        for (const auto p: curr->_child_list) {
+            //p->print_debug("PUSH");
             s.push(p);
+        }
         if (curr->is_eow()) {
             std::string word;
             for (const Node *p = curr; p->_parent; p = p->_parent)
