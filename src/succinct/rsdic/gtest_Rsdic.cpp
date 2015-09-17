@@ -245,6 +245,17 @@ TEST(Rsdic, InitFromString)
     g.add_string(str);
     const rsdic::Rsdic v = g.build();
 
+    // #8, m = 18, 19
+    {   // first_child = #11
+        //      rank1(18)        = 11
+        //      select0(11) + 1  = 24 -> #11
+        const uint64_t m = 18;
+        const uint64_t rank1 = v.rank1(m);
+        const uint64_t select0 = v.select0(rank1);
+        EXPECT_EQ(11, rank1);
+        EXPECT_EQ(24, select0 + 1);
+    }
+
     // shorthand: #9 = node 9
     // #9, m = 20, 21, 22
     {   // first_child = #12
