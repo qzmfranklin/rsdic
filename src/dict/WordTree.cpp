@@ -87,7 +87,10 @@ size_t WordTree::child_count(const index_t off) const
 
 size_t WordTree::child_count_iterative(const index_t off) const
 {
-    return 0;
+    index_t curr = off;
+    while(_louds->get_bit(curr))
+        curr++;
+    return curr - off;
 }
 
 WordTree::index_t WordTree::next_unsafe(const index_t off) const
