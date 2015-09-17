@@ -61,7 +61,9 @@ WordTree::index_t WordTree::parent(const index_t off) const
     bool bit;
     uint64_t rank0;
     _louds->get_bit_and_rank0(off, &bit, &rank0);
-    return bit ? _louds->select1((const uint32_t)rank0) : _louds->select1((const uint32_t)rank0 - 1);
+    if (rank0 == 0)
+        return 0;
+    return _louds->select1(bit ? rank0 : rank0 - 1);
 }
 
 WordTree::index_t WordTree::child(const index_t off) const
@@ -74,10 +76,11 @@ WordTree::index_t WordTree::child(const index_t off) const
 
 size_t WordTree::child_count(const index_t off) const
 {
-    assert(off == 0);
     bool bit;
     uint64_t rank0;
     _louds->get_bit_and_rank0(off, &bit, &rank0);
+    if (!bit)
+        return 0;
     rbx_index_t next = rank0 + 1;
     return is_valid_rbx_index(next) ? _louds->select0(next) - off : 0;
 }
@@ -97,19 +100,92 @@ WordTree::index_t WordTree::find(const std::string&) const
 {
     index_t retval = 0;
 
+void WordTree::_inspect_bit_debug(const char *action, const index_t index) const
+{
+    const rbx_index_t rbxoff = _get_rbx_index(index);
+    const uint8_t data = _get_data_byte(rbxoff);
+    fprintf(stderr,"%s\t%8u %02X %c\n", action, rbxoff, data, (char)data);
+    /*
+     *fprintf(stderr,"%s\t%8u %c %02X %c %u\n"
+     *        , action
+     *        , rbxoff
+     *        , _louds->get_bit(index) ? '1' : '0'
+     *        , data
+     *        , (char)data
+     *        , index
+     *        );
+     */
+}
+
+std::vector<std::string> WordTree::get_all_words() const
+{
+    std::vector<std::string> out;
+
     std::stack<index_t> s;
-    s.push(0); // super root
-    while(!s.empty()) {
-        //const index_t curr = s.top();
-        s.pop();
+
+    { // Push children of the super root
+        //_inspect_bit_debug("POP", 0);
+        const size_t num = _louds->select0(1);
+        for(int i = 0; i < num; i++) {
+            const index_t child = this->child(i);
+            //_inspect_bit_debug("PUSH", child);
+            s.push(child);
+        }
     }
 
-    return retval;
+    // Core loop
+    while(!s.empty()) {
+        const index_t curr = s.top();
+        s.pop();
+        //fprintf(stderr,"\n");
+        //_inspect_bit_debug("POP", curr);
+
+        const rbx_index_t rbxoff = _get_rbx_index(curr);
+        const char *buf;
+        int len;
+        buf = (const char*)rbx_get(_rbx, rbxoff, &len);
+        assert(buf);
+        assert(len);
+        const uint8_t bitmask = len > 1 ? buf[1] : 0;
+
+        const index_t last_bit_of_super_root = _louds->select0(1);
+        if (bitmask & BitMask::EndOfWord) {
+            std::string tmp;
+            for (index_t i = curr; i > last_bit_of_super_root; i = parent(i)) {
+                const rbx_index_t rbxoff = _get_rbx_index(i);
+                const char ch = static_cast<char>(_get_data_byte(rbxoff));
+                tmp.insert(0, 1, ch);
+            }
+            //printf("%s\n", tmp.c_str());
+            out.push_back(std::move(tmp));
+        }
+
+        // Push children.
+        const size_t num = child_count(curr);
+        for(index_t i = 0; i < num; i++) {
+            const index_t index = child(curr + i);
+            //_inspect_bit_debug("PUSH", index);
+            s.push(index);
+        }
+    }
+
+    std::sort(out.begin(), out.end());
+
+    return out;
+}
+
+void WordTree::dump_louds_debug() const
+{
+    assert(_louds);
+    _louds->dump_debug();
 }
 
 WordTree::rbx_index_t WordTree::_get_rbx_index(const index_t off) const
 {
-    return _louds->rank0(off);
+    bool bit;
+    uint64_t rank0;
+    _louds->get_bit_and_rank0(off, &bit, &rank0);
+    return bit ? rank0 : rank0 - 1;
 }
 
 uint8_t WordTree::_get_data_byte(const rbx_index_t rbxoff) const

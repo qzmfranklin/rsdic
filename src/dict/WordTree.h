@@ -125,19 +125,24 @@ public:
      */
     index_t find(const std::string&) const;
 
+    std::vector<std::string> get_all_words() const;
+    void dump_louds_debug() const;
+
 private:
     std::shared_ptr<rsdic::Rsdic> _louds = nullptr;
     uint32_t _rbx_max_index = 0;
     struct rbx *_rbx = nullptr;
 
     enum BitMask: uint8_t {
-        LastChild = 0x1,
-        EndOfWord = 0x1 << 1
+        EndOfWord = 0x1,
+        LastChild = 0x1 << 1
     };
 
     rbx_index_t _get_rbx_index(const index_t) const;
     uint8_t _get_data_byte(const rbx_index_t) const;
     uint8_t _get_flag_byte(const rbx_index_t) const;
+
+    void _inspect_bit_debug(const char*, const index_t) const;
 };
 
 } /* namespace dict */
