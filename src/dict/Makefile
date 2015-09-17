@@ -21,5 +21,6 @@ test: $(TESTS)
 gtest_WordTree.exe: $(ROOT)/gtest/gtest_main.a $(D)/gtest_WordTree.o $(D)/WordTree.o \
 	$(ROOT)/src/os/path.o \
 	$(ROOT)/src/succinct/rsdic/Rsdic.o \
+	$(ROOT)/src/succinct/rsdic/BitVectorIfc.o \
 	$(ROOT)/src/succinct/rsdic/EnumCoder.o \
-	$(ROOT)/src/succinct/rx/rx.o
+	$(ROOT)/src/succinct/rx/rx.o \

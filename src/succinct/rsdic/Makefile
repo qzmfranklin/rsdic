@@ -22,9 +22,9 @@ test: $(TESTS)
 # Sample linking rules for building executables:
 #test_heapsort.exe: $(D)/heapsort.o $(D)/test_heapsort.o $(ROOT)/utils/utils.o
 gtest_Rsdic.exe: $(D)/gtest_Rsdic.o $(D)/Rsdic.o $(ROOT)/gtest/gtest_main.a \
-	$(D)/RsdicBuilder.o $(D)/EnumCoder.o
+	$(D)/RsdicBuilder.o $(D)/EnumCoder.o $(D)/BitVectorIfc.o
 gtest_RsdicBuilder.exe: $(D)/gtest_RsdicBuilder.o $(D)/RsdicBuilder.o $(ROOT)/gtest/gtest_main.a \
-	$(D)/Rsdic.o $(D)/EnumCoder.o
+	$(D)/Rsdic.o $(D)/EnumCoder.o $(D)/BitVectorIfc.o
 gtest_Util.exe: $(D)/gtest_Util.o $(ROOT)/gtest/gtest_main.a
 gtest_EnumCoder.exe: $(D)/gtest_EnumCoder.o $(D)/EnumCoder.o $(ROOT)/gtest/gtest_main.a
 gtest_BytesAligner.exe: $(D)/gtest_BytesAligner.o $(ROOT)/gtest/gtest_main.a

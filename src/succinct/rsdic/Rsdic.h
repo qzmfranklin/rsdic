@@ -29,7 +29,7 @@
 
 namespace rsdic{
 
-class Rsdic: BitVectorIfc {
+class Rsdic: public BitVectorIfc {
 public:
   void clear();
   virtual bool get_bit(const uint64_t pos) const override;
