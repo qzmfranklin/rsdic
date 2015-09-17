@@ -1,6 +1,6 @@
 #	PROJECT-WIDE COMMON COMPILING FLAGS
 CC		:=clang
-CFLAGS 		:=-O3 -Wall -Drestrict=__restrict__ -DNDEBUG
+CFLAGS 		:=-O3 -Wall -Drestrict=__restrict__
 
 CXX		:=clang++
 CXXFLAGS	:=$(CFLAGS) -std=c++11
