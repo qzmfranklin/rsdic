@@ -99,9 +99,60 @@ WordTree::index_t WordTree::next_unsafe(const index_t off) const
     return _louds->select0(rank0 + 1) + 1;
 }
 
-WordTree::index_t WordTree::find(const std::string&) const
+WordTree::index_t WordTree::find(const std::string &key) const
 {
-    index_t retval = 0;
+    struct Node {
+        Node(index_t index_, size_t depth_): index(index_), depth(depth_) {}
+        index_t index = 0;
+        int depth = 0;
+    };
+
+    const size_t key_size = key.size();
+
+    std::stack<Node> s;
+
+    { // Push children of the super root
+        const size_t num = child_count(0);
+        for(int i = 0; i < num; i++)
+            s.push(Node(child(i), 1));
+    }
+
+    // Core loop
+    while(!s.empty()) {
+        const Node curr = s.top();
+        s.pop();
+
+        if (curr.depth > key_size)
+            continue;
+
+        const rbx_index_t rbxoff = _get_rbx_index(curr.index);
+        const char *buf;
+        int len;
+        buf = (const char*)rbx_get(_rbx, rbxoff, &len);
+        assert(buf);
+        assert(len);
+        const uint8_t bitmask = len > 1 ? buf[1] : 0;
+
+        const char ch = static_cast<char>(buf[0]);
+        if (ch != key[curr.depth - 1])
+           continue;
+
+        if (curr.depth == key_size) {
+            // Terminate if this is the last char.
+            if (bitmask & BitMask::EndOfWord)
+                return curr.index;
+            else
+                return 0;
+        } else {
+            // Push children.
+            const size_t num = child_count(curr.index);
+            for(int i = 0; i < num; i++)
+                s.push(Node(child(curr.index + i), curr.depth + 1));
+        }
+    }
+
+    return 0;
+}
 
 void WordTree::_inspect_bit_debug(const char *action, const index_t index) const
 {
