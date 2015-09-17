@@ -92,7 +92,7 @@ TEST(Rsdic, trivial_one)
 }
 
 
-TEST(Rsdic, get_bit_and_rank1)
+TEST(Rsdic, get_bit_and_rank)
 {
     rsdic::RsdicBuilder g;
     std::vector<int> B;
@@ -110,7 +110,7 @@ TEST(Rsdic, get_bit_and_rank1)
         EXPECT_EQ(B[i]  , v.get_bit(i)) << " i=" << i;
         bool bit;
         uint64_t rank;
-        v.get_bit_and_rank1(i, &bit, &rank);
+        v.get_bit_and_rank(i, &bit, &rank);
         EXPECT_EQ(B[i], bit);
         if (B[i]) {
             EXPECT_EQ(sum + 1, v.rank1(i));

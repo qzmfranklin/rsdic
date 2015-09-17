@@ -95,10 +95,13 @@ uint64_t Rsdic::rank1(const uint64_t pos) const
     return rank;
 }
 
+// TODO: This function is not being unit tested yet.
 void Rsdic::get_bit_and_rank0(const uint64_t pos, bool *bit, uint64_t *rank0) const
 {
-    this->get_bit_and_rank1(pos, bit, rank0);
-    *rank0 = pos + 1 - *rank0;
+    uint64_t rank1;
+    this->get_bit_and_rank1(pos, bit, &rank1);
+    *rank0 = pos + 1 - rank1;
+    //fprintf(stderr,"bit = %c, pos = %llu, rank1 = %llu, rank0 = %llu\n", *bit ? '1' : '0', pos, rank1, *rank0);
 }
 
 void Rsdic::get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const
@@ -118,9 +121,27 @@ void Rsdic::get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) co
     uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
 
     *bit   = ret_bit;
-    *rank1 = ret_bit ? rank + 1 : pos - rank;
+    *rank1 = ret_bit ? rank + 1 : rank;
+}
 
-    //return make_pair(ret_bit, ret_bit ? rank : pos - rank);
+void Rsdic::get_bit_and_rank(const uint64_t pos, bool *bit, uint64_t *rank1) const
+{
+    uint64_t lblock = pos / kLargeBlockSize;
+    uint64_t pointer = _pointer_blocks[lblock];
+    uint64_t sblock = pos / kSmallBlockSize;
+    uint64_t rank = _rank_blocks[lblock];
+    for (uint64_t i = lblock * kSmallBlockPerLargeBlock; i < sblock; ++i) {
+        uint64_t rank_sb = _rank_small_blocks[i];
+        rank += rank_sb;
+        pointer += EnumCoder::len(rank_sb);
+    }
+    uint64_t rank_sb = _rank_small_blocks[sblock];
+    uint64_t code = Util::get_slice(_bits, pointer, EnumCoder::len(rank_sb));
+    rank += EnumCoder::rank(code, rank_sb, pos % kSmallBlockSize);
+    uint64_t ret_bit = EnumCoder::get_bit(code, rank_sb, pos % kSmallBlockSize);
+
+    *bit   = ret_bit;
+    *rank1 = ret_bit ? rank + 1 : pos - rank;
 }
 
 

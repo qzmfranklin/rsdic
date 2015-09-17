@@ -46,6 +46,10 @@ public:
 
   void get_bit_and_rank0(const uint64_t pos, bool *bit, uint64_t *rank0) const;
   void get_bit_and_rank1(const uint64_t pos, bool *bit, uint64_t *rank1) const;
+
+  // If bit is 0, get rank0; otherwise get rank1
+  void get_bit_and_rank(const uint64_t pos, bool *bit, uint64_t *rank1) const;
+
   bool operator == (const Rsdic&) const;
 
   virtual void print() const override;
