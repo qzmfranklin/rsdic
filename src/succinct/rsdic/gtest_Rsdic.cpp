@@ -199,7 +199,7 @@ TEST(Rsdic, CStyleLoad)
 
         rsdic::Rsdic v;
         // This is what I want to test!
-        v.load(buf, len);
+        v.load_cstyle(buf);
         uint64_t one_num = v.one_num();
         for (uint64_t i = 0; i < one_num; i++)
             EXPECT_EQ(poses[i], v.select1(i + 1));

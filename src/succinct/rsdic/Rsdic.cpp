@@ -249,7 +249,7 @@ void Rsdic::load(std::istream& is)
 }
 
 // Used for fast loading
-size_t Rsdic::load(const void *buf, const uint64_t len)
+size_t Rsdic::load_cstyle(const void *buf)
 {
     const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
 
