@@ -267,17 +267,27 @@ size_t Rsdic::load_cstyle(const void *buf)
     return ptr - (const uint8_t*)buf;
 }
 
-uint64_t Rsdic::get_usage_bytes() const
+namespace {
+
+template <typename T>
+size_t _count_bytes(const std::vector<T> &v) {
+    assert(!v.empty());
+    const uint64_t size = v.size();
+    return sizeof(size) + sizeof(v[0]) * size;
+}
+
+}
+
+size_t Rsdic::binary_size() const
 {
-    return
-        _bits.size() * sizeof(_bits[0]) +
-        _pointer_blocks.size() * sizeof(_pointer_blocks[0]) +
-        _rank_blocks.size() * sizeof(_rank_blocks[0]) +
-        _select_one_inds.size() * sizeof(_select_one_inds[0]) +
-        _select_zero_inds.size() * sizeof(_select_zero_inds[0]) +
-        _rank_small_blocks.size() * sizeof(_rank_small_blocks[0]) +
-        sizeof(_num) +
-        sizeof(_one_num);
+    return sizeof(_num) + sizeof(_one_num)
+        + _count_bytes(_bits)
+        + _count_bytes(_pointer_blocks)
+        + _count_bytes(_rank_blocks)
+        + _count_bytes(_select_one_inds)
+        + _count_bytes(_select_zero_inds)
+        + _count_bytes(_rank_small_blocks)
+        ;
 }
 
 // TODO: Is this function ever useful?

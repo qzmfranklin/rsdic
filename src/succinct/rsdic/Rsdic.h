@@ -64,7 +64,7 @@ public:
   void save(std::ostream &os) const;
   void load(std::istream &is);
 
-  uint64_t get_usage_bytes() const;
+  size_t binary_size() const;
   /**
    * This is only needed fro RsdicBuilder::build(Rsdic&).
    * TODO: Remove this!
