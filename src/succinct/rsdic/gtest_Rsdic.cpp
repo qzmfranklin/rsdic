@@ -20,6 +20,8 @@
 #include <gtest/gtest.h>
 #include "RsdicBuilder.h"
 
+#include "src/os/path.h"
+
 #define private public
 #include "Rsdic.h"
 #include "EnumCoder.h"
@@ -187,12 +189,8 @@ TEST(Rsdic, CStyleLoad)
     }
 
     { // load with C-style functions and test
-        struct stat st;
-        if (::stat(fname, &st) != 0)
-            fprintf(stderr, "Cannot determine size of %s: %s\n", fname, ::strerror(errno));
-        const size_t len = st.st_size;
-
         FILE *fp = fopen(fname, "r");
+        const size_t len = os::path::getsize(fname);
         char *buf = (char *)malloc(len);
         fread(buf, 1, len, fp);
         fclose(fp);

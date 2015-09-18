@@ -3,6 +3,7 @@ D       :=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))# this directory
 -include $(ROOT)/root.mk
 -include $(ROOT)/gtest/rules.mk
 -include $(D)/rules.mk
+-include $(ROOT)/src/os/rules.mk
 -include $(DEP)
 
 # List all the executables you want to run when you type `make test` in $(TESTS)
@@ -22,7 +23,8 @@ test: $(TESTS)
 # Sample linking rules for building executables:
 #test_heapsort.exe: $(D)/heapsort.o $(D)/test_heapsort.o $(ROOT)/utils/utils.o
 gtest_Rsdic.exe: $(D)/gtest_Rsdic.o $(D)/Rsdic.o $(ROOT)/gtest/gtest_main.a \
-	$(D)/RsdicBuilder.o $(D)/EnumCoder.o $(D)/BitVectorIfc.o
+	$(D)/RsdicBuilder.o $(D)/EnumCoder.o $(D)/BitVectorIfc.o \
+    $(ROOT)/src/os/path.o
 gtest_RsdicBuilder.exe: $(D)/gtest_RsdicBuilder.o $(D)/RsdicBuilder.o $(ROOT)/gtest/gtest_main.a \
 	$(D)/Rsdic.o $(D)/EnumCoder.o $(D)/BitVectorIfc.o
 gtest_Util.exe: $(D)/gtest_Util.o $(ROOT)/gtest/gtest_main.a
