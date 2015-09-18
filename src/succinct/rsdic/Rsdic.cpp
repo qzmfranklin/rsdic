@@ -23,8 +23,6 @@
 #include "EnumCoder.h"
 #include "Rsdic.h"
 
-using namespace std;
-
 namespace rsdic
 {
 
