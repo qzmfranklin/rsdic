@@ -156,7 +156,7 @@ TEST(Rsdic, large)
         EXPECT_EQ(poses[i], v.select1(i + 1));
 }
 
-TEST(Rsdic, CStyleLoad)
+TEST(Rsdic, CStyleSaveLoad)
 {
     const char *fname = "/tmp/haha";
 
@@ -166,26 +166,21 @@ TEST(Rsdic, CStyleLoad)
         rsdic::RsdicBuilder g;
         const uint64_t n = 16llu * 1024llu * 1024llu; // 4MB
         for (uint64_t i = 0; i < n; i++) {
-            float r = (float)rand() / RAND_MAX;
-            if (r < 0.5) {
-                g.push_back(1);
-                poses.push_back(i);
-            } else g.push_back(0);
+            const double r = (double)rand() / RAND_MAX;
+            g.push_back( r < 0.5 );
         }
+
         const rsdic::Rsdic v = g.build();
 
-        std::ofstream os(fname);
-        v.save(os);
-    }
+        const size_t len = v.binary_size();
+        char *buf = (char*) malloc(len);
+        assert(buf);
+        v.save_cstyle(buf);
 
-    { // load with stream and test
-        rsdic::Rsdic v;
-        std::ifstream is(fname);
-        // This is what I want to test!
-        v.load(is);
-        uint64_t one_num = v.one_num();
-        for (uint64_t i = 0; i < one_num; i++)
-            EXPECT_EQ(poses[i], v.select1(i + 1));
+        FILE *fp = fopen(fname, "w");
+        const ssize_t bytessaved = fwrite(buf, 1, len, fp);
+        ASSERT_EQ(len, bytessaved);
+        fclose(fp);
     }
 
     { // load with C-style functions and test

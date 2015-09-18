@@ -23,6 +23,8 @@
 #include "EnumCoder.h"
 #include "Rsdic.h"
 
+#include <sstream>
+
 namespace rsdic
 {
 
@@ -246,7 +248,17 @@ void Rsdic::load(std::istream& is)
     _load(is, _rank_small_blocks);
 }
 
-// Used for fast loading
+// The save operation does not have to be super fast. Therefore this is just a
+// thin wrapper on the C++ stream save().
+size_t Rsdic::save_cstyle(void *buf) const
+{
+  std::stringstream ss;
+  this->save(ss);
+  const std::string tmp = ss.str();
+  memcpy(buf, tmp.data(), tmp.length());
+  return tmp.length();
+}
+
 size_t Rsdic::load_cstyle(const void *buf)
 {
     const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);

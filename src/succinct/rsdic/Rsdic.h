@@ -54,7 +54,16 @@ public:
 
   virtual void print() const override;
 
-  // Allows us to load the tree quickly
+  /*
+   * Save/Load the bitvector from a memory chunk.
+   * Return the number of bytes saved/loaded.
+   *
+   * NOTE: save_cstyle() is only a thin wrapper on save(). load_cstyle(),
+   *      though, is rewriten in C-style code. Because the speed of saving the
+   *      binary does not matter that much to us, whereas the loading speed is
+   *      critical.
+   */
+  size_t save_cstyle(void*) const;
   size_t load_cstyle(const void*);
 
   /**
