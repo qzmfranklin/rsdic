@@ -22,11 +22,14 @@
 
 #include "src/os/path.h"
 
+#include <fstream>
+
+// This is a darn hack made by the original author. Blame him.
+// TODO: Fix this when proper. Right now I just want to focus on actually
+// implementing the functionalities.
 #define private public
 #include "Rsdic.h"
 #include "EnumCoder.h"
-
-#include <fstream>
 
 TEST(BitVec, combination)
 {
