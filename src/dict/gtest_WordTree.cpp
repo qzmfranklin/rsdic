@@ -38,8 +38,12 @@ TEST(WordTree, test) {
         fclose(fp);
     }
 
+
     // Create the WordTree from the loaded buffer
-    dict::WordTree g(buf, len);
+    const dict::WordTree g(buf, len);
+    free(buf);
+
+    //g.dump_louds_debug();
 
     const std::string source_wordlist_fname = os::path::normpath(os::path::join({ this_dir, "../test_data/highlights/en-US.txt" }));
     std::vector<std::string> wordlist0;

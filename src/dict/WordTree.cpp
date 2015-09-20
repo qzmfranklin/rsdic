@@ -14,33 +14,36 @@ static uint32_t read_4bytes(const void *buf) {
     return (tmp0 << 24u) | (tmp1 << 16u) | (tmp2 << 8u) | tmp3;
 }
 
+//WordTree::WordTree(const char *ptr):
 WordTree::WordTree(const char *ptr, const size_t len):
     _louds(std::make_shared<rsdic::Rsdic>())
 {
     /*
-     * _louds->load() copies the data.
-     * rbx_open() allocates additional memory but does not copy the original
-     * data (TODO: need to verify this)
+     * _louds->load() copies the data internally. rbx_open() allocates
+     * additional memory but does not copy the original data.
+     *
+     * We need to copy data so that even when the original buffer is released,
+     * we can still use this WordTree object properly.
      */
-    const size_t offset = _louds->load(ptr, len);
+    const size_t offset = _louds->from_image(ptr);
     _rbx_max_index = read_4bytes(ptr + offset);
-    _rbx = rbx_open((const unsigned char*)ptr + offset + 4);
+
+    const size_t rbx_len = len - offset - 4;
+    _rbx_buf = (unsigned char*) malloc(rbx_len);
+    memcpy(_rbx_buf, ptr + offset + 4, rbx_len);
+    _rbx = rbx_open(_rbx_buf);
 }
 
 WordTree::~WordTree()
 {
     // _louds releases its own copy of memory in its dtor
     rbx_close(_rbx);
+    free(_rbx_buf);
 }
 
 bool WordTree::is_valid_rbx_index(const rbx_index_t off) const
 {
     return off <= _rbx_max_index;
-}
-
-bool WordTree::is_eow(const index_t off) const
-{
-    return _get_flag_byte(off) & static_cast<uint8_t>(BitMask::EndOfWord);
 }
 
 char WordTree::get_data(const index_t off) const

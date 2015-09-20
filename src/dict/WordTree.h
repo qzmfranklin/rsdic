@@ -47,7 +47,7 @@ public:
     typedef uint32_t index_t;
     typedef uint32_t rbx_index_t;
 
-    WordTree(const char *ptr, const size_t len);
+    WordTree(const char*, const size_t);
     ~WordTree();
 
     /*
@@ -56,7 +56,6 @@ public:
      *      is an end-of-word node
      */
     bool is_valid_rbx_index(const index_t) const;
-    bool is_eow(const index_t) const;
 
     /*
      * Return the UTF8 code unit associated with the node.
@@ -132,6 +131,7 @@ private:
     std::shared_ptr<rsdic::Rsdic> _louds = nullptr;
     uint32_t _rbx_max_index = 0;
     struct rbx *_rbx = nullptr;
+    uint8_t *_rbx_buf = nullptr;
 
     enum BitMask: uint8_t {
         EndOfWord = 0x1,
