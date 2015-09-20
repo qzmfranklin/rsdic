@@ -12,12 +12,13 @@ TEST(WordTree, test) {
     const std::string this_dir = os::path::realpath(os::path::dirname(__FILE__));
 
     char *buf = NULL;
-    size_t len = 0;
+    size_t len;
     { // Load image into buffer
         const std::string image_fname = os::path::normpath(os::path::join({ this_dir, "../builder/OUTPUT/dict.dat" }));
         //printf("%s\n", image_fname.c_str());
 
         ASSERT_TRUE(os::path::exists(image_fname));
+        //const size_t len = os::path::getsize(image_fname);
         len = os::path::getsize(image_fname);
         //printf("filesize = %zu\n", len);
 
@@ -26,7 +27,7 @@ TEST(WordTree, test) {
             fprintf(stderr, "Cannot open file: %s", image_fname.c_str());
             exit(1);
         }
-        buf = (char*)malloc(len + 1);
+        buf = (char*)malloc(len);
         assert(buf);
         const ssize_t bytesread = fread(buf, 1, len, fp);
         if (bytesread != len  ||  bytesread == -1) {
@@ -79,7 +80,5 @@ TEST(WordTree, test) {
         }
     }
 
-    { // Release buffer
-        free(buf);
-    }
+    //free(buf);
 }

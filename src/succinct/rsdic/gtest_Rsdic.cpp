@@ -167,22 +167,22 @@ TEST(Rsdic, CStyleSaveLoad)
 
     { // build and save
         rsdic::RsdicBuilder g;
-        const uint64_t n = 16llu * 1024llu * 1024llu; // 4MB
+        const uint64_t n = 16llu * 1024llu * 1024llu; // 16MB
         for (uint64_t i = 0; i < n; i++) {
-            const double r = (double)rand() / RAND_MAX;
-            g.push_back( r < 0.5 );
+            const bool r = ( (double)rand() / RAND_MAX ) < 0.5;
+            g.push_back(r);
+            poses.push_back(r);
         }
 
         const rsdic::Rsdic v = g.build();
 
         const size_t len = v.binary_size();
-        char *buf = (char*) malloc(len);
-        assert(buf);
-        v.save_cstyle(buf);
+        std::string image_string = v.to_image();
+        ASSERT_EQ(len, image_string.length());
 
         FILE *fp = fopen(fname, "w");
-        const ssize_t bytessaved = fwrite(buf, 1, len, fp);
-        ASSERT_EQ(len, bytessaved);
+        fwrite(image_string.data(), 1, len, fp);
+
         fclose(fp);
     }
 
@@ -190,15 +190,18 @@ TEST(Rsdic, CStyleSaveLoad)
         FILE *fp = fopen(fname, "r");
         const size_t len = os::path::getsize(fname);
         char *buf = (char *)malloc(len);
+        assert(buf);
         fread(buf, 1, len, fp);
         fclose(fp);
 
         rsdic::Rsdic v;
         // This is what I want to test!
-        v.load_cstyle(buf);
+        v.from_image(buf);
+        v.print();
+        free(buf);
         uint64_t one_num = v.one_num();
         for (uint64_t i = 0; i < one_num; i++)
-            EXPECT_EQ(poses[i], v.select1(i + 1));
+            ASSERT_EQ(poses[i], v.get_bit(i));
     }
 }
 
@@ -305,5 +308,5 @@ TEST(Rsdic, overflow)
 
     EXPECT_EQ(v.one_num(), v.rank1(v.size() - 1));
     EXPECT_EQ(v.zero_num(), v.rank0(v.size() - 1));
-    v.print();
+    //v.print();
 }

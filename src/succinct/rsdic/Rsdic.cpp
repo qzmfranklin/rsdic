@@ -17,13 +17,15 @@
  *      software without specific prior written permission.
  */
 
-#include <cassert>
 #include "Const.h"
 #include "Util.h"
 #include "EnumCoder.h"
 #include "Rsdic.h"
 
 #include <sstream>
+
+#include <assert.h>
+
 
 namespace rsdic
 {
@@ -210,18 +212,6 @@ void _load(std::istream& is, std::vector<T>& vs) {
   is.read((char*)&vs[0], sizeof(vs[0]) * size);
 }
 
-template <typename T>
-uint64_t _load_cstyle(const uint8_t *buf, std::vector<T>& vs) {
-    uint64_t bytesread = 0;
-    uint64_t size;
-    memcpy(&size, buf + bytesread, sizeof(size));
-    bytesread += sizeof(size);
-    vs.resize(size);
-    memcpy(&vs[0], buf + bytesread, sizeof(vs[0]) * size);
-    bytesread += sizeof(vs[0]) * size;
-    return bytesread;
-}
-
 } // anonymous namespace
 
 void Rsdic::save(std::ostream& os) const
@@ -248,18 +238,53 @@ void Rsdic::load(std::istream& is)
     _load(is, _rank_small_blocks);
 }
 
-// The save operation does not have to be super fast. Therefore this is just a
-// thin wrapper on the C++ stream save().
-size_t Rsdic::save_cstyle(void *buf) const
-{
-  std::stringstream ss;
-  this->save(ss);
-  const std::string tmp = ss.str();
-  memcpy(buf, tmp.data(), tmp.length());
-  return tmp.length();
+namespace {
+
+template <typename T>
+size_t _save_cstyle(uint8_t *buf, std::vector<T>& vs) {
+    size_t off = 0;
+    uint64_t size;
+
+    size = vs.size();
+    memcpy(buf + off, &size, sizeof(size));
+    off += sizeof(size);
+
+    size = vs.size() * sizeof(vs[0]);
+    memcpy(buf + off, vs.data(), sizeof(size));
+    off += sizeof(size);
+
+    return off;
 }
 
-size_t Rsdic::load_cstyle(const void *buf)
+template <typename T>
+size_t _load_cstyle(const uint8_t *buf, std::vector<T>& vs) {
+    size_t off = 0;
+    size_t size;
+
+    memcpy(&size, buf + off, sizeof(size));
+    off += sizeof(size);
+
+    vs.resize(size);
+
+    memcpy(&vs[0], buf + off, sizeof(vs[0]) * size);
+    off += sizeof(vs[0]) * size;
+
+    return off;
+}
+
+} // anonymous namespace
+
+
+// The save operation does not have to be super fast. Therefore this is just a
+// thin wrapper on the C++ stream save().
+std::string Rsdic::to_image() const
+{
+    std::stringstream ss;
+    this->save(ss);
+    return ss.str();
+}
+
+size_t Rsdic::from_image(const void *buf)
 {
     const uint8_t *ptr = reinterpret_cast<const uint8_t*>(buf);
 

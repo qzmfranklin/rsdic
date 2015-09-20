@@ -50,20 +50,10 @@ public:
   // If bit is 0, get rank0; otherwise get rank1
   void get_bit_and_rank(const uint64_t pos, bool *bit, uint64_t *rank1) const;
 
-  bool operator == (const Rsdic&) const;
   virtual void print(FILE *fp = stdout) const override;
 
-  /*
-   * Save/Load the bitvector from a memory chunk.
-   * Return the number of bytes saved/loaded.
-   *
-   * NOTE: save_cstyle() is only a thin wrapper on save(). load_cstyle(),
-   *      though, is rewriten in C-style code. Because the speed of saving the
-   *      binary does not matter that much to us, whereas the loading speed is
-   *      critical.
-   */
-  size_t save_cstyle(void*) const;
-  size_t load_cstyle(const void*);
+  std::string to_image() const;
+  size_t from_image(const void*);
 
   /**
    * This save/load pair are deprecated.
@@ -73,6 +63,9 @@ public:
   void load(std::istream &is);
 
   size_t binary_size() const;
+
+  bool operator == (const Rsdic&) const;
+
   /**
    * This is only needed fro RsdicBuilder::build(Rsdic&).
    * TODO: Remove this!

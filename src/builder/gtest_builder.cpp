@@ -14,8 +14,8 @@ TEST(Tree, input) {
     std::string fname = os::path::normpath(os::path::join({
                 this_dir, "../test_data/highlights/en-US.txt"
             }));
-    FILE *fp = fopen(fname.c_str(), "r");
-    if (!fp) {
+    FILE *fin = fopen(fname.c_str(), "r");
+    if (!fin) {
         fprintf(stderr,"Cannot open file: %s\n", fname.c_str());
         exit(1);
     }
@@ -30,7 +30,7 @@ TEST(Tree, input) {
         ssize_t bytesread;
 
         while (1) {
-            bytesread = getline(&buf, &len, fp);
+            bytesread = getline(&buf, &len, fin);
             if (bytesread == -1)
                 break;
             buf[bytesread - 1] = 0; // remove the trailing '\n'
@@ -56,8 +56,9 @@ TEST(Tree, input) {
     struct rbx *rbx = nullptr;
     const std::string ofname = os::path::join({this_dir, "OUTPUT", "dict.dat"});
     os::mkdir(os::path::join({this_dir, "OUTPUT"}));
-    std::ofstream os;
-    os.open(ofname, std::ios_base::out);
+    //std::ofstream os(ofname);
+    FILE *fout = fopen(ofname.c_str(), "w");
+    assert(fout);
     { // Build bit vector and rbx data
         //std::string tmp = g.export_ascii_debug();
         std::string data  = g.export_data();
@@ -69,11 +70,14 @@ TEST(Tree, input) {
             rsdic::RsdicBuilder builder;
             builder.add_string(louds);
             v = builder.build();
-            const auto start = os.tellp();
-            v.save(os);
+            const size_t len = v.binary_size();
+            //v.save(os);
+            const std::string image_string = v.to_image();
+            ASSERT_EQ(len, image_string.length());
+            fwrite(image_string.data(), 1, len, fout);
+
             v.print();
-            //printf("bitvec size = %llu\n", v.get_usage_bytes());
-            printf("rbx starts from offset = %lld\n", os.tellp() - start);
+            printf("rbx starts from offset = %zu\n", len);
         }
 
         { // Build rbx
@@ -117,7 +121,7 @@ TEST(Tree, input) {
                                 );
                         ASSERT_EQ(std::string(tmp), line);
                     }
-                    //printf("%2zu %X %X\n", len, buf[0], buf[1]);
+                    //printf("%2zu %02X %02X\n", len, (uint8_t)buf[0], buf[1]);
                     rbx_builder_push(builder, buf, len);
                     rbx_useful += len;
                 }
@@ -128,21 +132,24 @@ TEST(Tree, input) {
                 rbx_builder_build(builder);
 
                 const unsigned char *buf = rbx_builder_get_image(builder);
-                const int size = rbx_builder_get_size(builder);
+                const size_t size = (size_t)rbx_builder_get_size(builder);
+                rbx_builder_release(builder);
                 unsigned char *data = (unsigned char*) malloc(size);
                 assert(data);
                 memcpy(data, buf, size);
-                os.write((const char*)&rbx_size, sizeof(rbx_size));
-                os.write((const char*)data, size);
+                fwrite(&rbx_size, sizeof(rbx_size), 1, fout);
+                fwrite(data, 1, size, fout);
+                //os.write((const char*)&rbx_size, sizeof(rbx_size));
+                //os.write((const char*)data, size);
                 rbx = rbx_open(data);
 
-                printf("rbx size    = %d\n", size);
-                printf("total size  = %llu\n", size + v.get_usage_bytes());
+                printf("rbx size    = %zu\n", size);
+                printf("total size  = %zu\n", size + v.binary_size());
 
-                rbx_builder_release(builder);
             }
         }
     }
+    fclose(fout);
 
     rbx_close(rbx);
 }
