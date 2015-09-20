@@ -18,7 +18,7 @@ asm: $(ASM)
 clean:
 	$(QUIET)rm -f *.exe $(OBJ) $(DEP) $(ASM)
 test: $(TESTS)
-	$(QUIET)for t in $^ ; do ./"$$t" ; done
+	$(QUIET)for t in $^ ; do ./"$$t" || exit 1 ; done
 
 # Sample linking rules for building executables:
 #test_heapsort.exe: $(D)/heapsort.o $(D)/test_heapsort.o $(ROOT)/utils/utils.o
