@@ -51,8 +51,7 @@ public:
   void get_bit_and_rank(const uint64_t pos, bool *bit, uint64_t *rank1) const;
 
   bool operator == (const Rsdic&) const;
-
-  virtual void print() const override;
+  virtual void print(FILE *fp = stdout) const override;
 
   /*
    * Save/Load the bitvector from a memory chunk.

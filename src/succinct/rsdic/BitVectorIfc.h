@@ -18,7 +18,7 @@ public:
 
     virtual uint64_t size() const = 0;
 
-    virtual void print() const = 0;
+    virtual void print(FILE *fp = stdout) const = 0;
 
     virtual void dump_debug() const;
     //virtual bool operator[](const uint64_t off) const { return get_bit(off); };

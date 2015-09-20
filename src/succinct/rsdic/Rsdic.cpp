@@ -316,20 +316,21 @@ bool Rsdic::operator == (const Rsdic& bv) const
         _one_num == bv._one_num;
 }
 
-void Rsdic::print() const
+void Rsdic::print(FILE *fp) const
 {
-    fprintf(stdout,"    size        = %llu\n", _num);
-    fprintf(stdout,"    one_num     = %llu\n", _one_num);
-    fprintf(stdout,"    zero_num    = %llu\n", this->zero_num());
-    fprintf(stdout,"    one_ratio   = %lf\n", static_cast<double>(_one_num) / _num);
+    fprintf(fp, " size           = %llu\n", _num);
+    fprintf(fp, "_one_num        = %llu\n", _one_num);
+    fprintf(fp, "_zero_num       = %llu\n", this->zero_num());
+    fprintf(fp, "_one_ratio      = %lf\n" , static_cast<double>(_one_num) / _num);
 
-    fprintf(stdout,"    bits        = %lu\n" , _bits.size() * sizeof(_bits[0]) );
-    fprintf(stdout,"    ptr_blk     = %lu\n" , _pointer_blocks.size() * sizeof(_pointer_blocks[0]) );
-    fprintf(stdout,"    rank_blk    = %lu\n" , _rank_blocks.size() * sizeof(_rank_blocks[0]) );
-    fprintf(stdout,"    sel1ind     = %lu\n" , _select_one_inds.size() * sizeof(_select_one_inds[0]) );
-    fprintf(stdout,"    sel0ind     = %lu\n" , _select_zero_inds.size() * sizeof(_select_zero_inds[0]) );
-    fprintf(stdout," rank_small_blk = %lu\n", _rank_small_blocks.size() * sizeof(_rank_small_blocks[0]) );
+    fprintf(fp, "_bits           = %lu\n" , _count_bytes(_bits));
+    fprintf(fp, "_ptr_blk        = %lu\n" , _count_bytes(_pointer_blocks));
+    fprintf(fp, "_rank_blk       = %lu\n" , _count_bytes(_rank_blocks));
+    fprintf(fp, "_sel1ind        = %lu\n" , _count_bytes(_select_one_inds));
+    fprintf(fp, "_sel0ind        = %lu\n" , _count_bytes(_select_zero_inds));
+    fprintf(fp, "_rank_small_blk = %lu\n" , _count_bytes(_rank_small_blocks));
 
+    fprintf(fp, " total          = %lu\n" , this->binary_size());
 }
 
 }
